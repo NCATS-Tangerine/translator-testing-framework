@@ -1,3 +1,3 @@
 [submodule "reasoner_diff"]
 	path = reasoner_diff
-	url = https://github.com/NCATS-Tangerine/NCATS-ReasonerStdAPI-diff
+	url = git://github.com/NCATS-Tangerine/NCATS-ReasonerStdAPI-diff.git
