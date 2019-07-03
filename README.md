@@ -34,7 +34,7 @@ To run the Behave tests,
 behave
 ```
 
-> To successfully run all the defined tests, be sure to run the `reasoner_diff/server.py` first. 
+> To successfully run all the defined tests, be sure to run the `reasoner_diff/server.py` first.
 > `reasoner_diff/server.py` will start a local server on `http://0.0.0.0:9999`.
 
 
@@ -89,5 +89,7 @@ Objectives
 - Easy for Subject Matter Experts (SMEs) to write tests
 - Easy for programmers to codify testing behavior
 
+## Fork purpose
 
-
+The purpose of this fork is to extend the Translator Testing Framework's capabilities to allow for [TranQL](https://github.com/NCATS-Tangerine/tranql) queries.
+TranQL is a query language for interactive exploration of federated knowledge graphs. Its queries may span multiple reasoners, namely, ICEES, Gamma, RTX, and (partially) Indigo.
