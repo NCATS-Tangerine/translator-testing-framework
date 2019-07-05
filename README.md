@@ -91,6 +91,9 @@ Objectives
 
 ## Fork purpose
 
-The purpose of this fork is to extend the Translator Testing Framework's capabilities to allow for [TranQL](https://github.com/NCATS-Tangerine/tranql) queries.
+The purpose of this fork is to extend the Translator Testing Framework's capabilities to incorporate [TranQL](https://github.com/NCATS-Tangerine/tranql) queries.\
+Note: if running the dev server for TranQL, you need to use [this fork](https://github.com/frostyfan109/tranql/).
 
 TranQL is a query language for interactive exploration of federated knowledge graphs. Its queries may span multiple reasoners, namely, ICEES, Gamma, RTX, and (partially) Indigo.
+
+To only run TranQL specific tests, run `behave features/tranql-invalid-schema.feature features/tranql-reasoners.feature` in the root directory.
