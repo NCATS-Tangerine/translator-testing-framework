@@ -98,4 +98,4 @@ TranQL is a query language for interactive exploration of federated knowledge gr
 To only run TranQL specific tests, run `behave features/tranql-invalid-schema.feature features/tranql-reasoners.feature` in the root directory.
 
 To run the TranQL tests, you must run the TranQL dev server. You need to use [this fork](https://github.com/frostyfan109/tranql/).
-To run the dev server, follow the installation and usage guide in the repository's readme file.
+To run the dev server, follow the installation and usage guide in the repository's readme file. You only need to run the backplane and API.
