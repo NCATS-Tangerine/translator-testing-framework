@@ -1,9 +1,15 @@
-from behave import given, when, then, step
-import requests, jsonpath_rw
-from contextlib import closing
+import jsonpath_rw
 import logging
-from reasoner_diff.test_rtx import answer as rtx_answer
+import requests
+import json
+import sys
+from behave import given, when, then
+from contextlib import closing
 from reasoner_diff.test_robokop import answer as robokop_answer
+from reasoner_diff.test_robokop import question as robokop_question
+from reasoner_diff.test_robokop import headers as robokop_headers
+from reasoner_diff.test_rtx import answer as rtx_answer
+
 
 """
 Given
@@ -55,6 +61,9 @@ When
 
 @when('we fire the query to "{reasoner}" with URL "{url}" we expect a HTTP "{status_code:d}"')
 def step_impl(context, reasoner, url, status_code):
+    print("testing "+reasoner)
+
+
     """
     Fire a query to a reasoner.
 
@@ -69,14 +78,28 @@ def step_impl(context, reasoner, url, status_code):
         context.response_text = str(robokop_answer)
         context.response_json = robokop_answer
     else:
-        with closing(requests.get(url, stream=False)) as response:
+        with closing(requests.put(url, stream=False)) as response:
             context.code = response.status_code
             context.content_type = response.headers['content-type']
             assert response.status_code == status_code
             context.response_text = response.text
             context.response_json = response.json()
 
-
+@when('we fire an actual query to "{reasoner}" with URL "{url}" we expect a HTTP "{status_code:d}"')
+def step_impl(context, reasoner, url, status_code):
+    """
+    This step fires a query, defined in test_robokop.py, to the provided url and stores the response
+    as response_json in context.  We can then write further steps to analyze this response in whatever
+    way is needed.  Future revisions should allow the passing of different queries, rather than relying on
+    the hardcoded one from test_robokop.py
+    """
+    with closing(requests.post(url,data=json.dumps(robokop_question),headers=robokop_headers)) as response:
+        context.code = response.status_code
+        context.content_type = response.headers['content-type']
+        print(response.status_code)
+        assert response.status_code == status_code
+        context.response_text = response.text
+        context.response_json = response.json()
 @when('we compare the answer graphs')
 def step_impl(context):
     """
@@ -110,7 +133,38 @@ def step_impl(context, value):
     """
     assert context.response_text.rfind(value) != -1
 
+@then('the response should have some node with id "{id}" and field "{field}" with value "{value}"')
+def step_impl(context,id,field,value):
+    """this step will search a returned answer graph for a node with id (or equivalent_identifier)
+    equal to the provide id, and a node[{field}]==value and return true if the answer graph has
+    at least one such node
+    """
+    results=context.response_json
+    matchingNodes=[]
+    found_match=False
+    for node in results["knowledge_graph"]["nodes"]:
+        if field not in node:
+            continue
+        else:
+            data_type=type(node[field])
+            if(data_type==bool):
+                if(node[field] is bool(value)):
+                    matchingNodes.append(node)
+            #Need to implement checks for different types.  Continues are there to appease the interpreter
+            elif(data_type==str):
+                continue
+                #toDO
+            elif(data_type==int):
+                continue
+                #toDo
+            elif(data_type==float):
+                #toDo
+                continue
 
+    for node in matchingNodes:
+        if(node["id"]==id or id in node["equivalent_identifiers"]):
+            found_match=True
+    assert found_match
 @then('the response should have some JSONPath "{json_path}" with "{data_type}" "{value}"')
 def step_impl(context, json_path, data_type, value):
     """
