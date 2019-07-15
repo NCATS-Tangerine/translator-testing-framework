@@ -63,10 +63,8 @@ def step_impl(context, status_code):
     """
     Fire a query to TranQL
     """
-    dev = "http://localhost:8001/tranql/query"
-    prod = "https://tranql.renci.org/tranql/query"
 
-    url = dev
+    url = context.tranql_url
     with closing(requests.post(url, json={"query":context.tranql_query}, stream=False)) as response:
         context.code = response.status_code
         context.content_type = response.headers['content-type']
