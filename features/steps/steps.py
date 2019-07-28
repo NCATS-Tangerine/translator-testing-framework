@@ -15,6 +15,12 @@ from reasoner_diff.test_rtx import answer as rtx_answer
 Given
 """
 
+@given('the TranQL query')
+def step_impl(context):
+    """
+    Fetch answer from TranQL query.
+    """
+    context.tranql_query = context.text
 
 @given('a query graph "{reasoner}"')
 def step_impl(context, reasoner):
@@ -58,6 +64,19 @@ def step_impl(context, reasoner):
 When
 """
 
+@when('we fire the query to TranQL we expect a HTTP "{status_code:d}"')
+def step_impl(context, status_code):
+    """
+    Fire a query to TranQL
+    """
+
+    url = context.tranql_url
+    with closing(requests.post(url, json={"query":context.tranql_query}, stream=False)) as response:
+        context.code = response.status_code
+        context.content_type = response.headers['content-type']
+        assert response.status_code == status_code
+        context.response_text = response.text
+        context.response_json = response.json()
 
 @when('we fire the query to "{reasoner}" with URL "{url}" we expect a HTTP "{status_code:d}"')
 def step_impl(context, reasoner, url, status_code):
