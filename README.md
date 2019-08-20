@@ -37,10 +37,10 @@ behave
 > To successfully run all the defined tests, be sure to run the `reasoner_diff/server.py` first.
 > `reasoner_diff/server.py` will start a local server on `http://0.0.0.0:9999`.
 
-Run a single feature file
+Run a single feature file and display `print()` in console output:
 
 ```shell
-behave -i features/check-reasoners.feature
+behave -i features/check-reasoners.feature --no-capture
 ```
 
 

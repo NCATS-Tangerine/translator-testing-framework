@@ -9,17 +9,20 @@ Then its property "bl:name" should be "Lepirudin"
 """
 
 
-@given('the dataset "{graphUri}"')
-def step_impl(context, graphUri):
+@given('the entity "{entityUri}" in the dataset "{graphUri}"')
+def step_impl(context, entityUri, graphUri):
+    context.entityUri = entityUri
     context.graphUri = graphUri
 
-@when('we get the entity "{entityUri}"')
-def step_impl(context, entityUri):
-    context.entityUri = entityUri
+
+@when('we ask for the property "{property}"')
+def step_impl(context, property):
+    context.property = property
+
 
 # Run SPARQL to get the value of the required property
-@then('its property "{predicate}" should be "{value}"')
-def step_impl(context, predicate, value):
+@then('we get the answer "{value}"')
+def step_impl(context, value):
 
     sparql = SPARQLWrapper("http://graphdb.dumontierlab.com/repositories/ncats-red-kg")
     query = """
@@ -38,7 +41,7 @@ def step_impl(context, predicate, value):
         }
     }
     """
-    sparql.setQuery(query % (context.graphUri, context.entityUri, predicate))
+    sparql.setQuery(query % (context.graphUri, context.entityUri, context.property))
     sparql.setReturnFormat(JSON)
 
     results = sparql.query().convert()
