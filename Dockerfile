@@ -1,10 +1,11 @@
-FROM python:3.6
+FROM python:3.6-alpine
+
+LABEL maintainer "Vincent Emonet <vincent.emonet@maastrichtuniversity.nl>"
 
 WORKDIR /app
 
 COPY . .
 
-RUN apt-get update && \
-  pip install -r requirements.txt 
+RUN pip install -r requirements.txt 
 
 ENTRYPOINT ["behave"]
