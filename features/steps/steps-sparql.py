@@ -13,8 +13,8 @@ PREFIX void: <http://rdfs.org/ns/void#>
 PREFIX void-ext: <http://ldf.fi/void-ext#>
 """
 
-def run_sparql_query(query_string):
-    sparql = SPARQLWrapper("http://graphdb.dumontierlab.com/repositories/ncats-red-kg")
+def run_sparql_query(sparql_endpoint_url, query_string):
+    sparql = SPARQLWrapper(sparql_endpoint_url)
     sparql.setQuery(prefixes + query_string)
     sparql.setReturnFormat(JSON)
     results = sparql.query().convert()
@@ -35,9 +35,9 @@ When we run the sparql query:
 Then the sparql result "name" should be "Lepirudin"
 """
 
-@given('the sparql endpoint "{sparqlEndpoint}"')
-def step_impl(context, sparqlEndpoint):
-    context.sparqlEndpoint = sparqlEndpoint
+@given('the sparql endpoint "{sparql_endpoint}"')
+def step_impl(context, sparql_endpoint):
+    context.sparql_endpoint = sparql_endpoint
 
 
 @when('we run the sparql query')
@@ -48,7 +48,7 @@ def step_impl(context):
 # Run SPARQL to get the value of the required property
 @then('the sparql result "{predicate}" should be "{value}"')
 def step_impl(context, predicate, value):
-    results = run_sparql_query(context.query)
+    results = run_sparql_query(context.sparql_endpoint, context.query)
     
     # This loop doesn't work. Even if print shows that results["results"]["bindings"] is a list
     # Tried to cast it to Array using numpy np.asarray(myList), but still not working
