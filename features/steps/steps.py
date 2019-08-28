@@ -9,6 +9,7 @@ from reasoner_diff.test_robokop import answer as robokop_answer
 from reasoner_diff.test_robokop import question as robokop_question
 from reasoner_diff.test_robokop import headers as robokop_headers
 from reasoner_diff.test_rtx import answer as rtx_answer
+from resources.questions import question_map, fill_template
 
 
 """
@@ -21,6 +22,15 @@ def step_impl(context):
     Fetch answer from TranQL query.
     """
     context.tranql_query = context.text
+
+@given('a question "{question_type}"')
+def step_impl(context, question_type):
+    context.question = question_map[question_type]
+
+@given('node mappings')
+def step_impl(context):
+    node_mappings = json.loads(context.text)
+    context.question = fill_template(context.question, node_mappings)
 
 @given('a query graph "{reasoner}"')
 def step_impl(context, reasoner):
@@ -120,6 +130,19 @@ def step_impl(context, reasoner, url, status_code):
         context.response_text = response.text
         context.response_json = response.json()
 
+@when('we fire the query to URL "{url}"')
+def step_impl(context, url ):
+    """
+    Fire a query stored in the context to a reasoner.
+    """
+    with closing(requests.post(url,json=context.question)) as response:
+        context.code = response.status_code
+        context.content_type = response.headers['content-type']
+        print(response.status_code)
+        context.response = response
+        context.response_json = response.json()
+        print(context.response_json['answers'][0])
+
 
 @when('we fire a query to RTX with URL "{url}" we expect a HTTP "{status_code:d}"')
 def step_impl(context, url, status_code):
@@ -160,10 +183,13 @@ def step_impl(context):
 Then
 """
 
+@then('we expect a HTTP "{value:d}"')
+def step_impl(context,value):
+    assert context.response.status_code == value
 
 @then('the response should contain "{value}"')
 def step_impl(context, value):
-    """
+    """ 
     Check if the response contains a given string.
 
     """
@@ -201,10 +227,11 @@ def step_impl(context,id,field,value):
         if(node["id"]==id or id in node["equivalent_identifiers"]):
             found_match=True
     assert found_match
+
 @then('the response should have some JSONPath "{json_path}" with "{data_type}" "{value}"')
 def step_impl(context, json_path, data_type, value):
     """
-    The response should have some JSON path with a defined value of a specified data type.
+    The response should have some JSON path containing a defined value of a specified data type.
 
     """
     json_path_expr = jsonpath_rw.parse(json_path)
