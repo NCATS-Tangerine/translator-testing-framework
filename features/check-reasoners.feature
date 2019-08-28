@@ -20,3 +20,9 @@ Feature: Check all reasoners
         When we fire an actual query to "ROBOKOP" with URL "https://robokop.renci.org/api/simple/quick/" we expect a HTTP "200"
         Then the response should contain "knowledge_graph"
         Then the response should have some node with id "CHEBI:66919" and field "therapeutic_flag" with value "True"
+
+    Scenario: Check for RTX with actual query
+        Given a query graph "RTX"
+        When we fire a query to RTX with URL "https://rtx.ncats.io/api/rtx/v1/query" we expect a HTTP "200"
+        Then the response should contain "knowledge_graph"
+        Then the response should have some JSONPath "knowledge_graph.nodes[*].id" with "string" "HP:0030680"

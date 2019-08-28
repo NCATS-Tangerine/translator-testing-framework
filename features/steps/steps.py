@@ -144,6 +144,21 @@ def step_impl(context, url ):
         print(context.response_json['answers'][0])
 
 
+@when('we fire a query to RTX with URL "{url}" we expect a HTTP "{status_code:d}"')
+def step_impl(context, url, status_code):
+    """
+    This step fires a query to RTX and stores the response in context.
+    NOTE: It currently uses a hard-coded query, but eventually queries will be passed in.
+    """
+    question = {"query_type_id": "Q52", "terms": {"protein": "UniProtKB:Q9NVI1"}}
+    with closing(requests.post(url, json=question, headers={'accept': 'application/json'})) as response:
+        context.code = response.status_code
+        context.content_type = response.headers['content-type']
+        assert response.status_code == status_code
+        context.response_text = response.text
+        context.response_json = response.json()
+
+
 @when('we compare the answer graphs')
 def step_impl(context):
     """

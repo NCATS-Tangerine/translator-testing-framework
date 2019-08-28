@@ -37,6 +37,30 @@ behave
 > To successfully run all the defined tests, be sure to run the `reasoner_diff/server.py` first.
 > `reasoner_diff/server.py` will start a local server on `http://0.0.0.0:9999`.
 
+Run a single feature file
+
+```shell
+behave -i features/check-reasoners.feature
+```
+
+
+
+## Run with Docker
+
+```shell
+docker build -t translator-testing-framework .
+docker run -it translator-testing-framework -i features/check-reasoners.feature
+```
+
+## Run reasoner_diff
+
+```shell
+cd reasoner_diff
+pip install -r requirements.txt
+python server.py
+```
+
+
 
 ## Writing Behave tests
 
