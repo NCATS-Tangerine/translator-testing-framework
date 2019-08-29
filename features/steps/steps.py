@@ -3,6 +3,7 @@ import logging
 import requests
 import json
 import sys
+import os
 from behave import given, when, then
 from contextlib import closing
 from reasoner_diff.test_robokop import answer as robokop_answer
@@ -15,6 +16,20 @@ from resources.questions import question_map, fill_template
 """
 Given
 """
+@given('"{deckCount}" decks of cards from "{url}"')
+def step_impl(context, deckCount, url):
+    """
+    Given steps are really meant for more stateful things which we don't often
+     need for testing APIs when we don't really have a local state
+    """
+    context.deckURL=url
+    payload = {'deck_count':deckCount}
+    with closing(requests.get(url+"new/shuffle/", params=payload)) as response:
+        context.response_json = response.json()
+        context.deckId=response.json()['deck_id']
+        print(context.deckId)
+        assert response.status_code==200
+
 
 @given('the TranQL query')
 def step_impl(context):
@@ -73,6 +88,13 @@ def step_impl(context, reasoner):
 """
 When
 """
+@when ('we draw "{cardCount}" cards')
+def step_impl(context, cardCount,):
+    payload = {'count':cardCount}
+    with closing(requests.get(context.deckURL+context.deckId+"/draw/", params=payload)) as response:
+        context.response_json = response.json()
+
+
 
 @when('we fire the query to TranQL we expect a HTTP "{status_code:d}"')
 def step_impl(context, status_code):
@@ -182,6 +204,24 @@ def step_impl(context):
 """
 Then
 """
+@then ('our deck should have "{remainder}" cards remaining')
+def steps_impl(context,remainder):
+    assert context.response_json['remaining']==int(remainder)
+
+@then ('our deck should not still contain any cards that are in our hand')
+def steps_impl(context):
+    hand = context.response_json['cards']
+    remainder = context.response_json['remaining']
+    payload = {'count':remainder}
+    with closing(requests.get(context.deckURL+context.deckId+"/draw/", params=payload)) as response:
+        deck = response.json()['cards']
+        intersection = []
+        for x in deck:
+            for y in hand:
+                if x==y:
+                    intersection.append(x)
+
+        assert (not intersection)
 
 @then('we expect a HTTP "{value:d}"')
 def step_impl(context,value):
