@@ -27,7 +27,6 @@ def step_impl(context, deckCount, url):
     with closing(requests.get(url+"new/shuffle/", params=payload)) as response:
         context.response_json = response.json()
         context.deckId=response.json()['deck_id']
-        print(context.deckId)
         assert response.status_code==200
 
 
