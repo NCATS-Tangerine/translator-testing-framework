@@ -21,7 +21,17 @@ def step_impl(context, deckCount, url):
     """
     Given steps are really meant for more stateful things which we don't often
      need for testing APIs when we don't really have a local state
+
+
+    Example content of response:
+    {
+        "success": true,
+        "deck_id": "3p40paa87x90",
+        "shuffled": true,
+        "remaining": 52
+    }
     """
+
     context.deckURL=url
     payload = {'deck_count':deckCount}
     with closing(requests.get(url+"new/shuffle/", params=payload)) as response:
@@ -89,6 +99,29 @@ When
 """
 @when ('we draw "{cardCount}" cards')
 def step_impl(context, cardCount,):
+
+    """
+    Example content of response:
+    {
+    "success": true,
+    "cards": [
+        {
+            "image": "https://deckofcardsapi.com/static/img/KH.png",
+            "value": "KING",
+            "suit": "HEARTS",
+            "code": "KH"
+        },
+        {
+            "image": "https://deckofcardsapi.com/static/img/8C.png",
+            "value": "8",
+            "suit": "CLUBS",
+            "code": "8C"
+        }
+    ],
+    "deck_id":"3p40paa87x90",
+    "remaining": 50
+    }
+    """
     payload = {'count':cardCount}
     with closing(requests.get(context.deckURL+context.deckId+"/draw/", params=payload)) as response:
         context.response_json = response.json()
