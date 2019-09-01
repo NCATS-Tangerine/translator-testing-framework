@@ -1,1 +1,3 @@
 my-working-environment/
+.idea
+*.pyc
