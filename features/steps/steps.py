@@ -32,6 +32,15 @@ def step_impl(context):
     node_mappings = json.loads(context.text)
     context.question = fill_template(context.question, node_mappings)
 
+
+@given('an "{language}" question "{question}"')
+def step_impl(context, language, question):
+    context.human_question = {
+        "language": language,
+        "text": question
+    }
+
+
 @given('a query graph "{reasoner}"')
 def step_impl(context, reasoner):
     """
@@ -144,19 +153,28 @@ def step_impl(context, url ):
         print(context.response_json['answers'][0])
 
 
-@when('we fire a query to RTX with URL "{url}" we expect a HTTP "{status_code:d}"')
-def step_impl(context, url, status_code):
+@when('we send the question to RTX')
+def step_impl(context):
     """
-    This step fires a query to RTX and stores the response in context.
-    NOTE: It currently uses a hard-coded query, but eventually queries will be passed in.
+    This step sends a natural language question (stored in context.human_question) to RTX, makes sure that the server
+    returns a 200 status code, and stores the response in the context object. It makes two API calls: one to translate
+    the question and one to actually query the knowledge graph.
     """
-    question = {"query_type_id": "Q52", "terms": {"protein": "UniProtKB:Q9NVI1"}}
-    with closing(requests.post(url, json=question, headers={'accept': 'application/json'})) as response:
-        context.code = response.status_code
-        context.content_type = response.headers['content-type']
-        assert response.status_code == status_code
-        context.response_text = response.text
-        context.response_json = response.json()
+    # First translate the natural language question
+    translate_response = requests.post("https://rtx.ncats.io/api/rtx/v1/translate", json=context.human_question,
+                                       headers={'accept': 'application/json'})
+    context.content_type = translate_response.headers['content-type']
+    assert translate_response.status_code == 200
+    context.machine_question = translate_response.json()
+
+    # Then query RTX with the translated question
+    query_response = requests.post("https://rtx.ncats.io/api/rtx/v1/query", json=context.machine_question,
+                                   headers={'accept': 'application/json'})
+    context.code = query_response.status_code
+    context.content_type = query_response.headers['content-type']
+    assert query_response.status_code == 200
+    context.response_text = query_response.text
+    context.response_json = query_response.json()
 
 
 @when('we compare the answer graphs')
@@ -195,6 +213,14 @@ def step_impl(context, value):
     """
     assert context.response_text.rfind(value) != -1
 
+
+@then('the results should include a node with ID "{node_id}"')
+def step_impl(context, node_id):
+    nodes = context.response_json["knowledge_graph"]["nodes"]
+    node_found = any(node['id'] == node_id for node in nodes)
+    assert node_found
+
+
 @then('the response should have some node with id "{id}" and field "{field}" with value "{value}"')
 def step_impl(context,id,field,value):
     """this step will search a returned answer graph for a node with id (or equivalent_identifier)
@@ -227,6 +253,7 @@ def step_impl(context,id,field,value):
         if(node["id"]==id or id in node["equivalent_identifiers"]):
             found_match=True
     assert found_match
+
 
 @then('the response should have some JSONPath "{json_path}" with "{data_type}" "{value}"')
 def step_impl(context, json_path, data_type, value):
