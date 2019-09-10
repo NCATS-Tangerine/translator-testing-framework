@@ -32,14 +32,16 @@ def step_impl(context):
     node_mappings = json.loads(context.text)
     context.question = fill_template(context.question, node_mappings)
 
-
-@given('an "{language}" question "{question}"')
+@given('the "{language}" question "{question}"')
 def step_impl(context, language, question):
     context.human_question = {
         "language": language,
         "text": question
     }
 
+@given('the machine question')
+def step_impl(context):
+    context.machine_question = json.loads(context.text)
 
 @given('a query graph "{reasoner}"')
 def step_impl(context, reasoner):
@@ -156,16 +158,17 @@ def step_impl(context, url ):
 @when('we send the question to RTX')
 def step_impl(context):
     """
-    This step sends a natural language question (stored in context.human_question) to RTX, makes sure that the server
-    returns a 200 status code, and stores the response in the context object. It makes two API calls: one to translate
-    the question and one to actually query the knowledge graph.
+    This step sends a query to RTX, makes sure that the server returns a 200 status code, and stores the response in
+    context.
     """
-    # First translate the natural language question
-    translate_response = requests.post("https://rtx.ncats.io/api/rtx/v1/translate", json=context.human_question,
-                                       headers={'accept': 'application/json'})
-    context.content_type = translate_response.headers['content-type']
-    assert translate_response.status_code == 200
-    context.machine_question = translate_response.json()
+    # First translate the natural language question if there is one
+    if hasattr(context, 'human_question'):
+        translate_response = requests.post("https://rtx.ncats.io/api/rtx/v1/translate", json=context.human_question,
+                                           headers={'accept': 'application/json'})
+        context.content_type = translate_response.headers['content-type']
+        print(translate_response.text)
+        assert translate_response.status_code == 200
+        context.machine_question = translate_response.json()
 
     # Then query RTX with the translated question
     query_response = requests.post("https://rtx.ncats.io/api/rtx/v1/query", json=context.machine_question,
@@ -220,6 +223,39 @@ def step_impl(context, node_id):
     node_found = any(node['id'] == node_id for node in nodes)
     assert node_found
 
+@then('the results should contain the following nodes')
+def step_impl(context):
+    """
+    This step takes in a list of nodes (provided in table format) and checks to see if they are present in the
+    knowledge graph.
+    """
+    response_nodes = context.response_json["knowledge_graph"]["nodes"]
+    for row in context.table:
+        node_found = any(node['id'] == row['id'] for node in response_nodes)
+        assert node_found
+
+@then('the results should show that "{source_node}" "{edge_type}" "{target_node}"')
+def step_impl(context, source_node, target_node, edge_type):
+    """
+    This step checks for the presence of a particular edge in the knowledge graph.
+    """
+    edges = context.response_json["knowledge_graph"]["edges"]
+    edge_found = any(edge['source_id'] == source_node and edge['target_id'] == target_node and edge['type'] == edge_type
+                     for edge in edges)
+    assert edge_found
+
+@then('the results should contain the following relationships')
+def step_impl(context):
+    """
+    This step takes in a list of edges (provided in table format) and checks to see if they are present in the
+    knowledge graph.
+    """
+    response_edges = context.response_json["knowledge_graph"]["edges"]
+    for row in context.table:
+        edge_found = any(edge['source_id'] == row['source_id']
+                         and edge['target_id'] == row['target_id']
+                         and edge['type'] == row['edge_type'] for edge in response_edges)
+        assert edge_found
 
 @then('the response should have some node with id "{id}" and field "{field}" with value "{value}"')
 def step_impl(context,id,field,value):
