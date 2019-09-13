@@ -33,3 +33,12 @@ Feature: Tests for the RTX reasoning tool
         Given the "English" question "What proteins are in the phenylketonuria pathway?"
         When we send the question to RTX
         Then the results should include a node with ID "UniProtKB:P00439"
+
+    Scenario: Naproxen/cyclooxygenase pathway checks
+        Given the "English" question "What biological processes involve proteins targeted by naproxen?"
+        When we send the question to RTX
+        Then the results should include node "GO:0019371" with similarity value > 0.05
+        And the results should contain the following relationships
+            | source_id        | name  | edge_type    | target_id  | name                   |
+            | UniProtKB:P23219 | PTGS1 | involved_in  | GO:0019371 | cyclooxygenase pathway |
+            | UniProtKB:P35354 | PTGS2 | involved_in  | GO:0019371 | cyclooxygenase pathway |
