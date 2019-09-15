@@ -42,3 +42,16 @@ Feature: Tests for the RTX reasoning tool
             | source_id        | name  | edge_type    | target_id  | name                   |
             | UniProtKB:P23219 | PTGS1 | involved_in  | GO:0019371 | cyclooxygenase pathway |
             | UniProtKB:P35354 | PTGS2 | involved_in  | GO:0019371 | cyclooxygenase pathway |
+
+    Scenario: UROC1 participates in histidine catabolism
+        Given the machine question
+        """
+        {
+            "query_type_id": "Q63",
+            "terms": {
+                "protein": "UniProtKB:Q96N76"
+            }
+        }
+        """
+        When we send the question to RTX
+        Then the results should include node "REACT:R-HSA-6788656 (histidine catabolism)"
