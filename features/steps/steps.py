@@ -217,38 +217,55 @@ def step_impl(context, value):
     assert context.response_text.rfind(value) != -1
 
 
-@then('the results should include a node with ID "{node_id}"')
-def step_impl(context, node_id):
+@then('the results should include node "{node}"')
+def step_impl(context, node):
+    node_id = node.partition("(")[0].strip()  # Extract node ID from what was passed in
     nodes = context.response_json["knowledge_graph"]["nodes"]
     node_found = any(node['id'] == node_id for node in nodes)
     assert node_found
+
+
+@then('the results should include node "{node}" with similarity value > {min_expected_value}')
+def step_impl(context, node, min_expected_value):
+    node_id = node.partition("(")[0].strip()  # Extract node ID from what was passed in
+    results = context.response_json["results"]
+    relevant_result = next((result for result in results if result['row_data'][3] == node_id), None)
+    assert relevant_result is not None
+    similarity_value = relevant_result['row_data'][4]
+    assert similarity_value > min_expected_value
+
 
 @then('the results should contain the following nodes')
 def step_impl(context):
     """
     This step takes in a list of nodes (provided in table format) and checks to see if they are present in the
-    knowledge graph.
+    response knowledge graph.
     """
     response_nodes = context.response_json["knowledge_graph"]["nodes"]
     for row in context.table:
         node_found = any(node['id'] == row['id'] for node in response_nodes)
         assert node_found
 
+
 @then('the results should show that "{source_node}" "{edge_type}" "{target_node}"')
 def step_impl(context, source_node, target_node, edge_type):
     """
-    This step checks for the presence of a particular edge in the knowledge graph.
+    This step checks for the presence of a particular edge in the response knowledge graph.
     """
+    source_node_id = source_node.partition("(")[0].strip()  # Extract node ID from what was passed in
+    target_node_id = target_node.partition("(")[0].strip()  # Extract node ID from what was passed in
     edges = context.response_json["knowledge_graph"]["edges"]
-    edge_found = any(edge['source_id'] == source_node and edge['target_id'] == target_node and edge['type'] == edge_type
-                     for edge in edges)
+    edge_found = any(edge['source_id'] == source_node_id
+                     and edge['target_id'] == target_node_id
+                     and edge['type'] == edge_type for edge in edges)
     assert edge_found
+
 
 @then('the results should contain the following relationships')
 def step_impl(context):
     """
     This step takes in a list of edges (provided in table format) and checks to see if they are present in the
-    knowledge graph.
+    response knowledge graph.
     """
     response_edges = context.response_json["knowledge_graph"]["edges"]
     for row in context.table:
@@ -256,6 +273,7 @@ def step_impl(context):
                          and edge['target_id'] == row['target_id']
                          and edge['type'] == row['edge_type'] for edge in response_edges)
         assert edge_found
+
 
 @then('the response should have some node with id "{id}" and field "{field}" with value "{value}"')
 def step_impl(context,id,field,value):
