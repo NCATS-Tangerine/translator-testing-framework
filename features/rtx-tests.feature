@@ -18,7 +18,7 @@ Feature: Tests for the RTX reasoning tool
     Scenario: Acetaminophen targets PTGS1
         Given the "English" question "What are the drugs that target PTGS1?"
         When we send the question to RTX
-        Then the results should include node "CHEMBL.COMPOUND:CHEMBL112 (PTGS1)"
+        Then the results should include node "CHEMBL.COMPOUND:CHEMBL112 (acetaminophen)"
 
     Scenario: Fanconi anemia has expected symptoms
         Given the "English" question "What are the symptoms of Fanconi anemia?"
@@ -55,3 +55,16 @@ Feature: Tests for the RTX reasoning tool
         """
         When we send the question to RTX
         Then the results should include node "REACT:R-HSA-6788656 (histidine catabolism)"
+
+    Scenario: Adams-Oliver is associated with expected genes
+        Given the "English" question "What genes are associated with Adams-Oliver syndrome?"
+        When we send the question to RTX
+        Then the results should contain the following nodes
+            | id               | name     |
+            | UniProtKB:Q2M1Z3 | ARHGAP31 |
+            | UniProtKB:P60953 | CDC42    |
+            | UniProtKB:Q96HP0 | DOCK6    |
+            | UniProtKB:Q5NDL2 | EOGT     |
+            | UniProtKB:P46531 | NOTCH1   |
+            | UniProtKB:Q06330 | RBPJ     |
+            | UniProtKB:Q9NR61 | DLL4     |
