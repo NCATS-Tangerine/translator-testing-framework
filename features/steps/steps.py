@@ -158,21 +158,22 @@ def step_impl(context, url ):
 @when('we send the question to RTX')
 def step_impl(context):
     """
-    This step sends a query to RTX, makes sure that the server returns a 200 status code, and stores the response in
-    context.
+    This step sends a query (stored in context.machine_question) to RTX, makes sure that the server returns a 200
+    status code, and stores the response in context. If the question has been provided in human language format (in
+    context.human_question), it first sends that to RTX for translation into a machine question.
     """
-    # First translate the natural language question if there is one
+    rtx_api_url = "https://rtx.ncats.io/api/rtx/v1"
+    rtx_headers = {'accept': 'application/json'}
+
+    # First translate the natural language question, if there is one
     if hasattr(context, 'human_question'):
-        translate_response = requests.post("https://rtx.ncats.io/api/rtx/v1/translate", json=context.human_question,
-                                           headers={'accept': 'application/json'})
+        translate_response = requests.post(rtx_api_url + "/translate", json=context.human_question, headers=rtx_headers)
         context.content_type = translate_response.headers['content-type']
-        print(translate_response.text)
         assert translate_response.status_code == 200
         context.machine_question = translate_response.json()
 
     # Then query RTX with the translated question
-    query_response = requests.post("https://rtx.ncats.io/api/rtx/v1/query", json=context.machine_question,
-                                   headers={'accept': 'application/json'})
+    query_response = requests.post(rtx_api_url + "/query", json=context.machine_question, headers=rtx_headers)
     context.code = query_response.status_code
     context.content_type = query_response.headers['content-type']
     assert query_response.status_code == 200
@@ -217,29 +218,39 @@ def step_impl(context, value):
     assert context.response_text.rfind(value) != -1
 
 
-@then('the results should include node "{node}"')
+@then('the answer graph should include node "{node}"')
 def step_impl(context, node):
+    """
+    This step checks to see if a particular node is present in a reasoner's answer knowledge graph. The 'node' parameter
+    consists of a CURIE id, optionally followed by a node name in parentheses (e.g., 'UniProtKB:P00439 (PAH)'); anything
+    in parentheses is removed prior to processing.
+    """
     node_id = node.partition("(")[0].strip()  # Extract node ID from what was passed in
     nodes = context.response_json["knowledge_graph"]["nodes"]
     node_found = any(node['id'] == node_id for node in nodes)
     assert node_found
 
 
-@then('the results should include node "{node}" with similarity value > {min_expected_value}')
+@then('the results should include node "{node}" with similarity value > {min_expected_value:f}')
 def step_impl(context, node, min_expected_value):
+    """
+    This step checks to see if a particular node has been returned as a result from a reasoner with a similarity value
+    value above a specified threshold. The 'node' parameter consists of a CURIE id, optionally followed by a node name
+    in parentheses (e.g., 'UniProtKB:P00439 (PAH)'); anything in parentheses is removed prior to processing.
+    """
     node_id = node.partition("(")[0].strip()  # Extract node ID from what was passed in
     results = context.response_json["results"]
     relevant_result = next((result for result in results if result['row_data'][3] == node_id), None)
     assert relevant_result is not None
-    similarity_value = relevant_result['row_data'][4]
+    similarity_value = relevant_result['confidence']
     assert similarity_value > min_expected_value
 
 
-@then('the results should contain the following nodes')
+@then('the answer graph should contain the following nodes')
 def step_impl(context):
     """
-    This step takes in a list of nodes (provided in table format) and checks to see if they are present in the
-    response knowledge graph.
+    This step checks to see if a list of ground truth nodes (provided in table format in the .feature file) are all
+    present in a reasoner's answer knowledge graph. The input table must have an 'id' column with CURIE ids.
     """
     response_nodes = context.response_json["knowledge_graph"]["nodes"]
     for row in context.table:
@@ -247,25 +258,11 @@ def step_impl(context):
         assert node_found
 
 
-@then('the results should show that "{source_node}" "{edge_type}" "{target_node}"')
-def step_impl(context, source_node, target_node, edge_type):
-    """
-    This step checks for the presence of a particular edge in the response knowledge graph.
-    """
-    source_node_id = source_node.partition("(")[0].strip()  # Extract node ID from what was passed in
-    target_node_id = target_node.partition("(")[0].strip()  # Extract node ID from what was passed in
-    edges = context.response_json["knowledge_graph"]["edges"]
-    edge_found = any(edge['source_id'] == source_node_id
-                     and edge['target_id'] == target_node_id
-                     and edge['type'] == edge_type for edge in edges)
-    assert edge_found
-
-
-@then('the results should contain the following relationships')
+@then('the answer graph should contain the following relationships')
 def step_impl(context):
     """
-    This step takes in a list of edges (provided in table format) and checks to see if they are present in the
-    response knowledge graph.
+    This step takes in a list of edges (provided in table format) and checks to see if they are present in a reasoner's
+    answer knowledge graph. The input table must have 'source_id' and 'target_id' columns with CURIE ids.
     """
     response_edges = context.response_json["knowledge_graph"]["edges"]
     for row in context.table:
