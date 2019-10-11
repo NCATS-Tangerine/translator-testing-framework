@@ -93,4 +93,15 @@ Feature: Check all knowledge sources
         then the response contains "Aspirin" in "name"
 
 
+    Scenario: Check HMDB exactmatches
+        Given a knowledge source at "https://translator.ncats.io/hmdb-knowledge-beacon"
+        when we fire "/exactmatches?c=CHEBI:15365" query
+        then the size of the response is 1
+        and the response should have some JSONPath "$[0].has_exact_matches[0]" with "string" "HMDB:HMDB0001879"
 
+
+    Scenario: Check HMDB concept
+        Given a knowledge source at "https://translator.ncats.io/hmdb-knowledge-beacon"
+        when we fire "/concepts/HMDB:HMDB0001879" query
+        then the response should have some JSONPath "id" with "string" "HMDB:HMDB0001879"
+        then the response should have some JSONPath "name" with "string" "Aspirin"

@@ -1,6 +1,6 @@
 from behave import given, when, then
 import requests
-
+from contextlib import closing
 
 """
 Knowldge-source tests
@@ -21,7 +21,9 @@ def step_impl(context, query):
     """
     url = context.base_url+query
     print('url:',url,'\n')
-    context.response = requests.get(url).json()
+    with closing(requests.get(url)) as response:
+        context.response = response
+        context.response_json = response.json()
 
 
 @then('the response contains the following entries in "{key}" of "{parent}"')
@@ -31,7 +33,7 @@ def step_impl(context, key, parent):
     """
     entries = set()
     print('Collected entries:')
-    for entry in context.response:
+    for entry in context.response_json:
         print(' ', entry[parent][key])
         entries.add(entry[parent][key])
     print('Tested entries:')
@@ -47,7 +49,7 @@ def step_impl(context, key):
     """
     entries = set()
     print('Collected entries:')
-    for entry in context.response:
+    for entry in context.response_json:
         print(' ', entry[key])
         entries.add(entry[key])
     print('Tested entries:')
@@ -63,7 +65,7 @@ def step_impl(context, key, value):
     """
     entries = set()
     print('Collected entries:')
-    for entry in context.response:
+    for entry in context.response_json:
         print(' ', entry[key])
         entries.add(entry[key])
     print('Tested entry:')
@@ -82,7 +84,7 @@ def step_impl(context, key, parent):
         print(' ', row[key])
         entries.add(row[key])
     print('Tested entries:')
-    for entry in context.response:
+    for entry in context.response_json:
         print(' ', entry[parent][key])
         assert entry[parent][key] in entries
 
@@ -98,7 +100,14 @@ def step_impl(context, key):
         print(' ', row[key])
         entries.add(row[key])
     print('Tested entries:')
-    for entry in context.response:
+    for entry in context.response_json:
         print(' ', entry[key])
         assert entry[key] in entries
+
+@then('the size of the response is {size}')
+def step_impl(context, size):
+    """
+    This step checks the size of the response
+    """
+    assert len(context.response_json) == int(size)
 
