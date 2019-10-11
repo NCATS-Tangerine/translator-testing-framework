@@ -56,6 +56,21 @@ def step_impl(context, key):
         assert row[key] in entries
 
 
+@then('the response contains "{value}" in "{key}"')
+def step_impl(context, key, value):
+    """
+    This step checks whether all values specified in the test are contained in the response
+    """
+    entries = set()
+    print('Collected entries:')
+    for entry in context.response:
+        print(' ', entry[key])
+        entries.add(entry[key])
+    print('Tested entry:')
+    print(' ', value)
+    assert value in entries
+
+
 @then('the response only contains the following entries in "{key}" of "{parent}"')
 def step_impl(context, key, parent):
     """
