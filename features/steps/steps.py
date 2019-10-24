@@ -15,6 +15,20 @@ from resources.questions import question_map, fill_template
 """
 Given
 """
+@given('a valid entrez gene id "{gene_id}"')
+def step_impl(context, gene_id):
+    context.gene_id = gene_id
+
+
+@when('we query mygene.info API using this gene id')
+def step_impl(context):
+    url = 'http://mygene.info/v3/gene/{}?fields=symbol'.format(context.gene_id)
+    data = requests.get(url)
+    context.response = data
+
+@then('we expect gene symbol is returned for this gene id')
+def step_impl(context):
+    assert 'symbol' in context.response.json()
 
 @given('the TranQL query')
 def step_impl(context):
