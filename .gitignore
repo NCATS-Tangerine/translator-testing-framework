@@ -3,3 +3,4 @@ my-working-environment/
 *.pyc
 /venv/
 /reasoner_diff/*
+**/__pycache__
