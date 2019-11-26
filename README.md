@@ -11,7 +11,10 @@ git clone --recursive https://github.com/deepakunni3/translator-testing-framewor
 
 **Note:** Be sure to use `--recursive` flag to clone the [NCATS-Tangerine/NCATS-ReasonerStdAPI-diff](https://github.com/NCATS-Tangerine/NCATS-ReasonerStdAPI-diff) dependency.
 
-After cloning the repo, set up a virtual environment using Python 3's `venv` module,
+
+After cloning the repo, set up a virtual environment using Python 3's `venv` module (or your preferred tool, e.g. 
+Conda or local IDE equivalent),
+
 ```
 python3 -m venv my-working-environment
 ```
@@ -28,7 +31,7 @@ pip install -r requirements.txt
 
 ## Running Local support services for the Behave tests
 
-The behave tests rely on access to additional REST microservices running locally. These need to be started first, 
+Some Behave tests rely on access to additional REST microservices running locally. These need to be started first, 
 before running the tests.
 
 ### Translator Reasoner Graph comparison service
