@@ -2,4 +2,4 @@ my-working-environment/
 .idea
 *.pyc
 /venv/
-/reasoner_diff/
+/reasoner_diff/*
