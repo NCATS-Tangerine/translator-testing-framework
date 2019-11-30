@@ -94,10 +94,23 @@ def step_impl(context, reasoner):
         context.answer_graphs = []
     context.answer_graphs.append(answer_graph_map[reasoner])
 
+@given('identifier {ident} and type {stype}')
+def step_impl(context,ident,stype):
+    context.identifier = ident
+    context.semantic_type = stype
+
 
 """
 When
 """
+
+@when('we call synonymizer')
+def step_impl(context):
+    url=f'http://robokop.renci.org:6010/api/synonymize/{context.identifier}/{context.semantic_type}/'
+    response = requests.post(url)
+    context.response = response
+    context.response_json = response.json()
+    print(context.response_json)
 
 @when('we fire the query to TranQL we expect a HTTP "{status_code:d}"')
 def step_impl(context, status_code):
@@ -150,7 +163,6 @@ def step_impl(context, reasoner, url, status_code):
     with closing(requests.post(url,data=json.dumps(robokop_question),headers=robokop_headers)) as response:
         context.code = response.status_code
         context.content_type = response.headers['content-type']
-        print(response.status_code)
         assert response.status_code == status_code
         context.response_text = response.text
         context.response_json = response.json()
@@ -163,10 +175,8 @@ def step_impl(context, url ):
     with closing(requests.post(url,json=context.question)) as response:
         context.code = response.status_code
         context.content_type = response.headers['content-type']
-        print(response.status_code)
         context.response = response
         context.response_json = response.json()
-        print(context.response_json['answers'][0])
 
 
 @when('we send the question to RTX')
@@ -347,6 +357,25 @@ def step_impl(context, json_path, data_type, value):
             is_found = True
 
     assert is_found is True
+
+@then('we expect the main identifier to be {identifier}')
+def step_impl(context,identifier):
+    assert context.response_json['id'] == identifier
+
+@then('we expect the name to be "{name}"')
+def step_impl(context,name):
+    assert context.response_json['name'] == name
+
+@then('we expect the equivalent identifiers to contain {identifier}')
+def step_impl(context,identifier):
+    syns = [ x[0] for x in context.response_json['synonyms'] ]
+    assert identifier in syns
+
+@then('we do not expect the equivalent identifiers to contain {identifier}')
+def step_impl(context,identifier):
+    syns = [ x[0] for x in context.response_json['synonyms'] ]
+    assert not identifier in syns
+
 
 @then('the response should have some JSONPath "{json_path}" containing "{data_type}" "{value}"')
 def step_impl(context, json_path, data_type, value):
