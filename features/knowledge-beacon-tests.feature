@@ -105,11 +105,12 @@ Feature: Check knowledge beacons
         when we fire "/concepts?keywords=aspirin&categories=protein" query
         then the response contains "Acetylsalicylate deacetylase." in "name"
 
-    Scenario: Check Rhea Beacon exactmatches
-        Given a knowledge source at "https://kba.ncats.io/beacon/rhea"
-        when we fire "/exactmatches?c=EC%3A3.1.1.55" query
-        then the size of the response is 1
-        and the response should have some JSONPath "$[0].has_exact_matches[0]" with "string" ""
+    # Rhea doesn't really support exactmatches?
+    #Scenario: Check Rhea Beacon exactmatches
+    #    Given a knowledge source at "https://kba.ncats.io/beacon/rhea"
+    #    when we fire "/exactmatches?c=EC%3A3.1.1.55" query
+    #    then the size of the response is 1
+    #    and the response should have some JSONPath "$[0].has_exact_matches[0]" with "string" ""
 
     Scenario: Check Rhea Beacon concept
         Given a knowledge source at "https://kba.ncats.io/beacon/rhea"
