@@ -4,7 +4,7 @@ def before_all(context):
     context.target = 'http://127.0.0.1:9999'
 
     tranql_conf = {
-        'dev' : "http://localhost:8001/tranql/query",
+        'dev' : "http://localhost:8099/tranql/query",  # the suggested 'dev' server seems to publish on port 8099?
         'prod' : "https://tranql.renci.org/tranql/query"
     };
     environment = os.getenv('ENV', "dev")
