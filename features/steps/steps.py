@@ -2,6 +2,7 @@ import jsonpath_rw
 import logging
 import requests
 import json
+import pandas as pd
 import sys
 from behave import given, when, then
 from contextlib import closing
@@ -10,6 +11,7 @@ from reasoner_diff.test_robokop import question as robokop_question
 from reasoner_diff.test_robokop import headers as robokop_headers
 from reasoner_diff.test_rtx import answer as rtx_answer
 from resources.questions import question_map, fill_template
+from parse_answer import parse_answer
 
 
 """
@@ -94,10 +96,46 @@ def step_impl(context, reasoner):
         context.answer_graphs = []
     context.answer_graphs.append(answer_graph_map[reasoner])
 
+@given('identifier {ident} and type {stype}')
+def step_impl(context,ident,stype):
+    context.identifier = ident
+    context.semantic_type = stype
+
+@given('identifiers {ident} and type {stype}')
+def step_impl(context,ident,stype):
+    context.identifiers = ident.split(',')
+    context.semantic_type = stype
 
 """
 When
 """
+
+@when('we call synonymizer')
+def step_impl(context):
+    url=f'http://robokop.renci.org:6010/api/synonymize/{context.identifier}/{context.semantic_type}/'
+    response = requests.post(url)
+    context.response = response
+    context.response_json = response.json()
+
+@when('we call gamma similarity with result type {rtype}, intermediate type {itype}, and threshold {thresh:f}')
+def step_impl(context,rtype,itype,thresh):
+    url=f'http://robokop.renci.org/api/simple/similarity/{context.semantic_type}/{context.identifier}/{rtype}/{itype}'
+    params = {'threshhold': thresh}
+    response = requests.get(url, params = params)
+    context.response = response
+    context.similarity_result = pd.DataFrame(response.json())
+
+@when('we call gamma enrichment with result type {rtype}')
+def step_impl(context,rtype):
+    url=f'https://robokop.renci.org/api/simple/enriched/{context.semantic_type}/{rtype}/'
+    params = {'identifiers': context.identifiers}
+    response = requests.post(url, json = params)
+    context.response = response
+    df = pd.DataFrame(response.json())
+    df.sort_values(by='p',inplace=True)
+    context.enrichment_result = df
+
+
 
 @when('we fire the query to TranQL we expect a HTTP "{status_code:d}"')
 def step_impl(context, status_code):
@@ -150,7 +188,6 @@ def step_impl(context, reasoner, url, status_code):
     with closing(requests.post(url,data=json.dumps(robokop_question),headers=robokop_headers)) as response:
         context.code = response.status_code
         context.content_type = response.headers['content-type']
-        print(response.status_code)
         assert response.status_code == status_code
         context.response_text = response.text
         context.response_json = response.json()
@@ -163,10 +200,8 @@ def step_impl(context, url ):
     with closing(requests.post(url,json=context.question)) as response:
         context.code = response.status_code
         context.content_type = response.headers['content-type']
-        print(response.status_code)
         context.response = response
         context.response_json = response.json()
-        print(context.response_json['answers'][0])
 
 
 @when('we send the question to RTX')
@@ -347,6 +382,49 @@ def step_impl(context, json_path, data_type, value):
             is_found = True
 
     assert is_found is True
+
+@then('we expect the main identifier to be {identifier}')
+def step_impl(context,identifier):
+    assert context.response_json['id'] == identifier
+
+@then('we expect the name to be "{name}"')
+def step_impl(context,name):
+    assert context.response_json['name'] == name
+
+@then('we expect the equivalent identifiers to contain {identifier}')
+def step_impl(context,identifier):
+    syns = [ x[0] for x in context.response_json['synonyms'] ]
+    assert identifier in syns
+
+@then('we do not expect the equivalent identifiers to contain {identifier}')
+def step_impl(context,identifier):
+    syns = [ x[0] for x in context.response_json['synonyms'] ]
+    assert not identifier in syns
+
+@then('at least {x:d} of the top {y:d} names of node {nid} should contain the text "{text}"')
+def step_impl(context,x,y,nid,text):
+    aframe = parse_answer(context.response_json,node_list=[f'{nid}'])
+    names = aframe[0:y][f'{nid} - name'].tolist()
+    n = len(list(filter(lambda x: text in x, names)))
+    assert(n >= x)
+
+@then('the top {x:d} names of node {nid} should contain "{names_string}"')
+def step_impl(context,x,nid,names_string):
+    aframe = parse_answer(context.response_json,node_list=[f'{nid}'])
+    answernames = aframe[0:x][f'{nid} - name'].tolist()
+    names = names_string.split(',')
+    for name in names:
+        assert name in answernames
+
+@then('we expect the name of the most similar to be "{simname}"')
+def step_impl(context,simname):
+    most_similar = context.similarity_result.iloc[0]['name']
+    assert most_similar == simname
+
+@then('we expect the name of the most enriched to be "{enriched_name}"')
+def step_impl(context,enriched_name):
+    most_enriched = context.enrichment_result.iloc[0]['name']
+    assert most_enriched == enriched_name
 
 @then('the response should have some JSONPath "{json_path}" containing "{data_type}" "{value}"')
 def step_impl(context, json_path, data_type, value):
