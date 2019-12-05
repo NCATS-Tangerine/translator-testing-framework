@@ -458,6 +458,21 @@ def step_impl(context, json_path, data_type, value):
 
     assert is_found is True
 
+@when('the message is processed by {url}')
+def call(context, url):
+    """Send message to microservice."""
+    request = {
+        'message': {
+            'query_graph': context.query_graph,
+            'results': getattr(context, 'results', []),
+        },
+        'options': getattr(context, 'options', {})
+    }
+    if 'knowledge_graph' in context:
+        request['message']['knowledge_graph'] = context.knowledge_graph
+    context.response = requests.post(url, json=request)
+    context.response_json = context.response.json()
+
 use_step_matcher('re')
 
 @given('a (?P<key>.*)')
