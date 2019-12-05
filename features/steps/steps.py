@@ -1,10 +1,11 @@
+from functools import partial
 import jsonpath_rw
 import logging
 import requests
 import json
 import pandas as pd
 import sys
-from behave import given, when, then
+from behave import given, when, then, use_step_matcher
 from contextlib import closing
 from reasoner_diff.test_robokop import answer as robokop_answer
 from reasoner_diff.test_robokop import question as robokop_question
@@ -456,3 +457,69 @@ def step_impl(context, json_path, data_type, value):
             is_found = True
 
     assert is_found is True
+
+use_step_matcher('re')
+
+@given('a (?P<key>.*)')
+def append_to_list(context, key):
+    """Append element to list in context.
+
+    Create the list if it does not exist.
+    """
+    key = key.replace(' ', '_') + 's'
+    value = getattr(context, key, [])
+    value.append(json.loads(context.text))
+    setattr(context, key, value)
+
+@given('(?P<key>.*)')
+def add_scalar(context, key):
+    """Add a scalar value to context."""
+    key = key.replace(' ', '_')
+    setattr(context, key, json.loads(context.text))
+
+@then(
+    r'the response should have '
+    r'(?:(?:(?P<n2>an? |\d+ )?(?P<key2>[\w\-:]+) with )?'
+    r'(?P<n1>an? |\d+ )?(?P<key1>[\w\-:]+) with )?'
+    r'(?P<n0>an? |\d+ )?(?P<key0>[\w\-:]+)'
+    r'(?: (?P<containing>containing )?(?P<value>[\w\-:]+))?')
+def check_json(context, **kwargs):
+    """Check JSON structure/value.
+
+    e.g. 'the response should have a result with an edge_binding with weight 5'
+    matches the structure
+    results:
+      - node_bindings: ...
+        edge_bindings:
+        - kg_id: ''
+          qg_id: ''
+          weight: 5
+        - ...
+      - ...
+    """
+    values = [context.response_json]
+    for i in reversed(range(3)):
+        if not kwargs[f'key{i}']:
+            continue
+        if kwargs[f'n{i}']:
+            try:
+                n = int(kwargs[f'n{i}'])
+            except ValueError:
+                values = [x for value in values for x in value.get(kwargs[f'key{i}'] + 's', [])]
+                continue
+            _values = []
+            for value in values:
+                x = value.get(kwargs[f'key{i}'] + 's', [])
+                if len(x) != n:
+                    continue
+                _values.extend(x)
+            values = _values
+        else:
+            values = [value.get(kwargs[f'key{i}'], None) for value in values]
+    if kwargs['value']:
+        if kwargs['containing']:
+            assert any(value and type(value[0])(kwargs['value']) in value for value in values)
+        else:
+            assert any(value and value == type(value)(kwargs['value']) for value in values)
+
+use_step_matcher("parse")
