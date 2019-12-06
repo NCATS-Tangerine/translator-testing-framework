@@ -1,4 +1,9 @@
 import requests
+from biothings_explorer.hint import Hint
+from biothings_explorer.registry import Registry
+from biothings_explorer.user_query_dispatcher import FindConnection
+
+reg = Registry()
 
 """
 Given
@@ -18,6 +23,24 @@ def step_impl(context, chembl):
 @given('a valid disease MONDO id "{mondo}"')
 def step_impl(context, mondo):
     context.mondo = mondo
+
+@given('a valid gene symbol "{symbol}"')
+def step_impl(context, symbol):
+    ht = Hint()
+    gene_hint = ht.query(symbol)
+    context.gene = gene_hint['Gene'][0]
+
+@given('a valid disease named "{name}"')
+def step_impl(context, name):
+    ht = Hint()
+    disease_hint = ht.query(name)
+    context.disease = disease_hint['DiseaseOrPhenotypicFeature'][0]
+
+@given('a valid disease "{disease}" and a valid chemical named "{chemical}"')
+def step_impl(context, disease, chemical):
+    ht = Hint()
+    context.disease = ht.query(disease)['DiseaseOrPhenotypicFeature'][0]
+    context.chemical = ht.query(chemical)['ChemicalSubstance'][0]
 
 """
 When
@@ -46,6 +69,33 @@ def step_impl(context):
     data = requests.get(url)
     context.response = data
 
+@when('we query biothings explorer for chemicals related to this gene')
+def step_impl(context):
+    context.fc = FindConnection(input_obj=context.gene,
+                                output_obj="ChemicalSubstance",
+                                intermediate_nodes=None,
+                                registry=reg)
+    context.fc.connect(verbose=True)
+
+@when('we query biothings explorer for drugs that are associated with genes which are invovled in the disease')
+def step_impl(context):
+    context.fc = FindConnection(input_obj=context.disease,
+                                output_obj="ChemicalSubstance",
+                                intermediate_nodes=['Gene'],
+                                registry=reg)
+    context.fc.connect(verbose=True)
+    print(context.fc.fc.G)
+
+@when('we query biothings explorer to identify plausible reasoning chains to explain the relationship between two entities')
+def step_impl(context):
+    context.fc = FindConnection(input_obj=context.disease,
+                                output_obj=context.chemical,
+                                intermediate_nodes=['Gene'],
+                                registry=reg)
+    context.fc.connect(verbose=True)
+    print(context.fc.fc.G)
+
+
 """
 Then
 """
@@ -64,3 +114,11 @@ def step_impl(context, name):
 @then('we expect the disease ontology ID to be "{doid}"')
 def step_impl(context, doid):
     assert doid == context.response.json()['mondo']['xrefs']['doid']
+
+@then('we expect "{chemical}" is one of the chemicals in the results')
+def step_impl(context, chemical):
+    assert chemical in context.fc.fc.G
+
+@then('we expect gene "{gene}" is one of the explanations that may link the two entities')
+def step_impl(context, gene):
+    assert gene in context.fc.fc.G
