@@ -11,7 +11,10 @@ git clone --recursive https://github.com/deepakunni3/translator-testing-framewor
 
 **Note:** Be sure to use `--recursive` flag to clone the [NCATS-Tangerine/NCATS-ReasonerStdAPI-diff](https://github.com/NCATS-Tangerine/NCATS-ReasonerStdAPI-diff) dependency.
 
-After cloning the repo, set up a virtual environment using Python 3's `venv` module,
+
+After cloning the repo, set up a virtual environment using Python 3's `venv` module (or your preferred tool, e.g. 
+Conda or local IDE equivalent),
+
 ```
 python3 -m venv my-working-environment
 ```
@@ -26,6 +29,34 @@ Now install required packages,
 pip install -r requirements.txt
 ```
 
+## Running Local support services for the Behave tests
+
+Some Behave tests rely on access to additional REST microservices running locally. These need to be started first, 
+before running the tests.
+
+### Translator Reasoner Graph comparison service
+
+Run the  `reasoner_diff/server.py`:
+ 
+```
+cd reasoner_diff
+python server.py
+```
+
+which starts a local server on `http://0.0.0.0:9999` for Translator reasoner graph comparisons.
+
+### TRANQL Server
+
+The Translator Testing Framework now incorporates [TranQL](https://github.com/NCATS-Tangerine/tranql) queries.
+
+TranQL is a query language for interactive exploration of federated knowledge graphs. Its queries may span multiple 
+reasoners, namely, ICEES, Gamma, RTX, and (partially) Indigo.
+
+To run the TranQL tests, you must run the TranQL dev server. You need to use 
+[this fork](https://github.com/frostyfan109/tranql/).
+
+To run the dev server, follow the installation and usage guide in the repository's README file. 
+You only need to run the backplane and API.
 
 ## Running Behave tests
 
@@ -34,16 +65,14 @@ To run the Behave tests,
 behave
 ```
 
-> To successfully run all the defined tests, be sure to run the `reasoner_diff/server.py` first.
-> `reasoner_diff/server.py` will start a local server on `http://0.0.0.0:9999`.
-
 Run a single feature file
 
 ```shell
 behave -i features/check-reasoners.feature
 ```
 
-
+To only run TranQL specific tests, run 
+`behave features/tranql-invalid-schema.feature features/tranql-reasoners.feature` in the root directory.
 
 ## Run with Docker
 
@@ -112,14 +141,3 @@ Objectives
 - Allow for strict as well as fuzzy validation
 - Easy for Subject Matter Experts (SMEs) to write tests
 - Easy for programmers to codify testing behavior
-
-## Fork purpose
-
-The purpose of this fork is to extend the Translator Testing Framework's capabilities to incorporate [TranQL](https://github.com/NCATS-Tangerine/tranql) queries.
-
-TranQL is a query language for interactive exploration of federated knowledge graphs. Its queries may span multiple reasoners, namely, ICEES, Gamma, RTX, and (partially) Indigo.
-
-To only run TranQL specific tests, run `behave features/tranql-invalid-schema.feature features/tranql-reasoners.feature` in the root directory.
-
-To run the TranQL tests, you must run the TranQL dev server. You need to use [this fork](https://github.com/frostyfan109/tranql/).
-To run the dev server, follow the installation and usage guide in the repository's readme file. You only need to run the backplane and API.
