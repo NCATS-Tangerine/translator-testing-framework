@@ -10,7 +10,7 @@ Feature: Tests for the Indigo reinforcement learning reasoner
     Scenario: indications of bivalirudin
         Given "chemical substance" "bivalirudin" with ID "185855"
         When we query RLR for "indications"
-        Then the answer graph contains the following nodes
+        Then the result graph contains the following nodes
             | id     | name                              |
             | 185855 | bivalirudin                       |
             | 625529 | Heparin-induced thrombocytopenia  |

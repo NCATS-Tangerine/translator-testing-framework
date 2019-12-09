@@ -14,6 +14,8 @@ def step_impl(context, subject_type, subject_name, subject_id):
     context.subject_id = subject_id
 
 
+## specific to indigo reinforcement reasoner ##
+
 @when('we query RLR for "{query}"')
 def step_impl(context, query):
     """
@@ -61,7 +63,7 @@ def step_impl(context, query):
         context.response_text = response.text
         context.response_json = response.json()
 
-@then('the answer graph contains the following nodes')
+@then('the result graph contains the following nodes')
 def step_impl(context):
     """
     Test whether the answer graph includes the nodes provided in the feature file
@@ -77,17 +79,39 @@ def step_impl(context):
         print(' ', row['id'])
         assert int(row['id']) in node_ids
 
+####
+
+## specific to indigo workflow reasoner ##
 @when('we query IndigoR for "{query}"')
 def step_impl(context, query):
     """
     Send a query to the Indigo workflow reasoner
     """
-    if query == "protein targets":
-        query_relation = "targets"
-        target_type = "protein"
 
     if context.subject_type == "chemical substance":
         subject_type = "chemical_substance"
+    elif context.subject_type == "condition":
+        subject_type = "disease"
+    elif context.subject_type == "symptom":
+        subject_type = "phenotypic_feature"
+
+
+    query_relation = ""
+    target_type = ""
+    if query == "protein targets":
+        query_relation = "targets"
+        target_type = "protein"
+    elif query == "indications":
+        query_relation = "has_indication"
+        target_type = "disease"
+    elif query == "associated symptoms":
+        query_relation = "associated_with"
+        target_type = "phenotypic_feature"
+    elif query == "associated conditions":
+        query_relation = "associated_with"
+        target_type = "disease"
+
+
 
     print(query)
 
@@ -145,7 +169,7 @@ def step_impl(context, query):
         context.response_json = response.json()
 
 
-@then('the result graph contains the following nodes')
+@then('the result graph (v0.9) contains the following nodes')
 def step_impl(context):
     """
     Test whether the answer graph includes the nodes provided in the feature file
@@ -157,7 +181,12 @@ def step_impl(context):
         for node in result["result_graph"]["nodes"]:
             print(' ', node['id'])
             node_ids.add(node['id'])
+            for alt_id in node["node_attributes"]:
+                print(' ', alt_id["value"])
+                node_ids.add(alt_id["value"])
     print('Tested entries:')
     for row in context.table:
         print(' ', row['id'])
         assert row['id'] in node_ids
+
+####
