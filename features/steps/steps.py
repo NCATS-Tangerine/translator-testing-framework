@@ -461,22 +461,32 @@ def call(context, url):
 
 use_step_matcher('re')
 
-@given('a (?P<key>.*)')
-def append_to_list(context, key):
-    """Append element to list in context.
 
-    Create the list if it does not exist.
-    """
-    key = key.replace(' ', '_') + 's'
-    value = getattr(context, key, [])
-    value.append(json.loads(context.text))
-    setattr(context, key, value)
+# This is much too generic a pattern matching template which
+# will override any other @given in the steps.py file which starts with the English article 'a'
+# so we comment it out!
+#
+#@given('a (?P<key>.*)')
+#def append_to_list(context, key):
+#   """Append element to list in context.
+#
+#    Create the list if it does not exist.
+#    """
+#    key = key.replace(' ', '_') + 's'
+#    value = getattr(context, key, [])
+#    value.append(json.loads(context.text))
+#    setattr(context, key, value)
 
-@given('(?P<key>.*)')
-def add_scalar(context, key):
-    """Add a scalar value to context."""
-    key = key.replace(' ', '_')
-    setattr(context, key, json.loads(context.text))
+#
+# This is much too generic a pattern matching template which
+# will override practically everything other @given in the steps.py file
+# so we comment it out!
+#
+#@given('(?P<key>.*)')
+#def add_scalar(context, key):
+#    """Add a scalar value to context."""
+#    key = key.replace(' ', '_')
+#    setattr(context, key, json.loads(context.text))
 
 @then(
     r'the response should have '
