@@ -1,8 +1,9 @@
-from ncats.translator.module.disease.gene.disease_associated_genes import DiseaseAssociatedGeneSet
+from ncats.translator.modules.disease.gene.disease_associated_genes import DiseaseAssociatedGeneSet
 
-@given('a disease term {disease_identifier} for disease label {disease_label} in Translator Modules')
+@given('the disease term {disease_identifier} for disease label {disease_label} in Translator Modules')
 def step_impl(context, disease_identifier, disease_label):
-    context.disease = {"disease_identifier":disease_identifier, "disease_label":disease_label} 
+    context.disease = {"disease_identifier":disease_identifier, "disease_label":disease_label}
+
 
 @when('we run the disease associated genes Translator Module')
 def step_impl(context):
