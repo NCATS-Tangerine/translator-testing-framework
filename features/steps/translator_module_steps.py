@@ -12,7 +12,7 @@ def step_impl(context):
     context.module = DiseaseAssociatedGeneSet(context.disease)
     
     
-@then('the response contains {gene_ids}')
+@then('the module result contains {gene_ids}')
 def step_impl(context):    
     hit_ids = [ x["hit_id"] for x in context.module.disease_associated_genes ]
     gene_ids = gene_ids.split(",")
