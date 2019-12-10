@@ -171,8 +171,6 @@ Feature: Check Rhea Knowledge beacons
             | CHEBI:13719 |
             | RHEA:11752  |
 
-Feature: Check SMPDB Knowledge beacons
-
     Scenario: Check SMPDB Beacon categories
         Given a knowledge source at "https://kba.ncats.io/beacon/smpdb"
         when we fire "/categories" query
