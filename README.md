@@ -25,8 +25,16 @@ source my-working-environment/bin/activate
 ```
 
 Now install required packages,
+
 ```
 pip install -r requirements.txt
+```
+
+Note: double check which version of `pip` you have and its relationship to your Python executable. In some contexts, 
+the visible `pip` will not be targeting your python3 binary. A safer way to execute `pip` may therefore be as follows: 
+
+```
+python3 -m pip install -r requirements.txt
 ```
 
 ## Running Local support services for the Behave tests

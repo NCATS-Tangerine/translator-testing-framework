@@ -1,4 +1,4 @@
-from ncats.translator.module.disease.gene import disease_associated_genes
+from ncats.translator.module.disease.gene.disease_associated_genes import DiseaseAssociatedGeneSet
 
 @given('a disease term {disease_identifier} for disease label {disease_label} in Translator Modules')
 def step_impl(context, disease_identifier, disease_label):
@@ -10,11 +10,11 @@ def step_impl(context):
     
     #initialization will run the method
     context.module = DiseaseAssociatedGeneSet(context.disease)
-    
-    
-@then('the module result contains {gene_ids}')
-def step_impl(context):    
+
+
+@then('the Translator Module result contains {gene_ids}')
+def step_impl(context,gene_ids):
     hit_ids = [ x["hit_id"] for x in context.module.disease_associated_genes ]
     gene_ids = gene_ids.split(",")
     for gene in gene_ids:
-      assert gene in hit_ids
+        assert gene in hit_ids
