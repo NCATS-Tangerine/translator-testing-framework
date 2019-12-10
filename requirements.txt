@@ -1,4 +1,6 @@
 behave==1.2.6
 jsonpath-rw==1.4.0
 requests>=2.22.0
-
+-e git+https://github.com/biothings/biothings_explorer#egg=biothings_explorer
+-e git+https://github.com/biothings/biothings_schema.py#egg=biothings_schema
+pandas>=0.25.0
