@@ -66,6 +66,12 @@ To run the TranQL tests, you must run the TranQL dev server. You need to use
 To run the dev server, follow the installation and usage guide in the repository's README file. 
 You only need to run the backplane and API.
 
+### Translator Modules Support Services
+
+Behave testing for several test scenarios in the Translator Modules feature testing require access to support web 
+services which need to be running and accessible before running the tests.  Instructions for running these services is 
+[documented here](https://github.com/ncats/translator-modules#special-prerequisite-for-running-the-translator-modules).
+
 ## Running Behave tests
 
 To run the Behave tests,
