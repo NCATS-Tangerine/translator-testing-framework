@@ -252,14 +252,10 @@ Feature: Check Rhea Knowledge beacons
             | local_prefix |
             | CHEBI        |
             | HMDB         |
-            | UNIPROT      |
-            | SMP          |
         And the response only contains the following entries in "local_prefix":
             | local_prefix |
             | CHEBI        |
             | HMDB         |
-            | UNIPROT      |
-            | SMP          |
 
     Scenario: Check SMPDB Beacon Knowledge Map
         Given a knowledge source at "https://kba.ncats.io/beacon/smpdb"
