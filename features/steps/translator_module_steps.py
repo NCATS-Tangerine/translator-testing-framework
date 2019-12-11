@@ -6,6 +6,11 @@ def step_impl(context, disease_identifier, disease_label):
     context.disease = {"disease_identifier": disease_identifier, "disease_label": disease_label}
 
 
+@given('the Translator Modules input "{identifiers}"')
+def step_impl(context, identifiers):
+    context.input_identifiers = identifiers.split(",")
+
+
 @when('we run the disease associated genes Translator Module')
 def step_impl(context):
     #translator-modules/ncats/translator/modules/disease/gene/
@@ -20,7 +25,7 @@ def step_impl(context):
 
 @then('the Translator Module result contains "{gene_ids}"')
 def step_impl(context,gene_ids):
-    hit_ids = [ x["hit_id"] for x in context.module.disease_associated_genes ]
+    hit_ids = [ x["hit_id"] for x in context.module.disease_associated_genes]
     gene_ids = gene_ids.split(",")
     for gene in gene_ids:
         assert gene in hit_ids
