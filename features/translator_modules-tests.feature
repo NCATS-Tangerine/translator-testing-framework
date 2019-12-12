@@ -5,7 +5,17 @@ Feature: Check Translator Module disease associated genes
             When we run the Translator "Disease Associated Genes" Module
             Then the Translator Module result contains "HGNC:3582,HGNC:3584"
 
+    Scenario: Check Translator Module Functional Similarity for Fanconi Anemia
+        Given the Translator Modules input "genes" "HGNC:3582,HGNC:3584"
+            When we run the Translator "Functional Similarity" Module
+            Then the Translator Module result contains "HGNC:18536,HGNC:1100"
+
+    Scenario: Check Translator Module Phenotype Similarity for Fanconi Anemia
+        Given the Translator Modules input "genes" "HGNC:3582,HGNC:3584"
+            When we run the Translator "Phenotype Similarity" Module
+            Then the Translator Module result contains "HGNC:3582,HGNC:3584"
+
     Scenario: Check Translator Module Gene Interactions for Fanconi Anemia
         Given the Translator Modules input "genes" "HGNC:3582,HGNC:3584"
             When we run the Translator "Gene Interaction" Module
-            Then the Translator Module result contains "HGNC:3582,HGNC:3584"
+            Then the Translator Module result contains "HGNC:1100,HGNC:18536"

@@ -4,25 +4,53 @@ This repo is a prototype to demonstrate how [Behave](https://behave.readthedocs.
 
 ## Getting started
 
+### Cloning the Repository
+
 Clone this repository,
 ```
 git clone --recursive https://github.com/deepakunni3/translator-testing-framework.git
 ```
 
-**Note:** Be sure to use `--recursive` flag to clone the [NCATS-Tangerine/NCATS-ReasonerStdAPI-diff](https://github.com/NCATS-Tangerine/NCATS-ReasonerStdAPI-diff) dependency.
+**Note:** Be sure to use `--recursive` flag to clone the 
+[NCATS-Tangerine/NCATS-ReasonerStdAPI-diff](https://github.com/NCATS-Tangerine/NCATS-ReasonerStdAPI-diff) dependency.
 
+### Creation of a Python 3.7 Virtual Environment
 
 After cloning the repo, set up a virtual environment using Python 3's `venv` module (or your preferred tool, e.g. 
 Conda or local IDE equivalent),
 
 ```
-python3 -m venv my-working-environment
+python3.7 -m venv venv
 ```
 
-Then, activate `my-working-environment`,
+Here, `python3.7` is assumed to be a Python 3.7 binary. On your systems, you may simply need to type `python3` or even 
+`python` (if your default python executable is a release 3.7 or better binary).
+
+The command creates a virtual environment `venv`, which may be activated by typing:
+
 ```
-source my-working-environment/bin/activate
+source venv/bin/activate
 ```
+
+To exit the environment, type:
+
+```
+deactivate
+```
+
+To reenter, source the activate command again.
+
+Alternately, you can also use use `conda` env to manage packages and the development environment:
+
+```
+conda create -n translator-modules python=3.7
+conda activate translator-modules
+```
+
+Some IDE's (e.g. PyCharm) may also have provisions for directly creating such a virtualenv. This should also work fine. 
+Simply follow your IDE specific instructions to configure it.
+
+### Installation of Python Dependencies
 
 Now install required packages,
 
@@ -37,8 +65,12 @@ Note: double check which version of `pip` you have and its relationship to your 
 the visible `pip` will not be targeting your python3 binary. A safer way to execute `pip` may therefore be as follows: 
 
 ```
-python3 -m pip install -r requirements.txt --no-cache-dir
+python -m pip install -r requirements.txt --no-cache-dir
 ```
+
+Note that given the rapid cycles of development of the various NCATS projects being covered by Behave tests, it is 
+advisable to periodically rerun the pip module installation process to ensure access to the latest synchronized code, 
+especially after a `git pull` operation is done.
 
 ## Running Local support services for the Behave tests
 
