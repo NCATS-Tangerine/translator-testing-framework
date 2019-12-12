@@ -111,9 +111,13 @@ def step_impl(context, query):
         query_relation = "associated_with"
         target_type = "disease"
 
+    source_id = "n00"
+    target_id = "n01"
 
-
-    print(query)
+    # switch source and target id for question in which query node order is reversed
+    if query_relation == "associated_with" and subject_type == "disease" and target_type == "phenotypic_feature":
+        source_id = "n01"
+        target_id = "n00"
 
     context.query_json = {"asynchronous": "false",
                           "bypass_cache": "true",
@@ -126,8 +130,8 @@ def step_impl(context, query):
                             "edges": [
                               {
                                 "edge_id": "e00",
-                                "source_id": "n00",
-                                "target_id": "n01",
+                                "source_id": source_id,
+                                "target_id": target_id,
                                 "type": query_relation
                               }
                             ],
@@ -151,6 +155,8 @@ def step_impl(context, query):
                           ]
                           
                         }
+
+    print(query)
 
     url = "https://indigo.ncats.io/reasoner/api/v1"
     headers = {'accept': 'application/json'}
