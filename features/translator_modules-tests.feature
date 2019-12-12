@@ -7,6 +7,7 @@ Feature: Check Translator Module disease associated genes
 
     Scenario: Check Translator Module Functional Similarity for Fanconi Anemia
         Given the Translator Modules input "genes" "HGNC:3582,HGNC:3584"
+        And module parameters "threshold:0.35"
             When we run the Translator "Functional Similarity" Module
             Then the Translator Module result contains "HGNC:18536,HGNC:1100"
 

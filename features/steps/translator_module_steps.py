@@ -13,8 +13,30 @@ def step_impl(context, disease_identifier, disease_label):
 
 @given('the Translator Modules input "{type}" "{identifiers}"')
 def step_impl(context, type, identifiers):
+
     print('Given input_'+type+' identifiers: '+identifiers)
-    context.input_parameters = {"input_"+type: identifiers.split(",")}
+
+    if not context.input_parameters:
+        context.input_parameters = {}
+
+    context.input_parameters.update({"input_"+type: identifiers.split(",")})
+
+
+@given('module parameters "{parameters}"')
+def step_impl(context, type, parameters):
+
+    print('Given module parameters: '+parameters)
+
+    # separate comma delimited parameters into list
+    parameter_list = parameters.split(",")
+
+    # convert parameter list into a named parameter dictionary
+    parameter_dict = {k: v for (k, v) in [p.split(":") for p in parameter_list]}
+
+    if not context.input_parameters:
+        context.input_parameters = {}
+
+    context.input_parameters.update(parameter_dict)
 
 
 # catalog of package/modules in translator-modules/ncats/translator/modules/
