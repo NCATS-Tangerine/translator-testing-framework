@@ -27,14 +27,17 @@ source my-working-environment/bin/activate
 Now install required packages,
 
 ```
-pip install -r requirements.txt
+pip install -r requirements.txt --no-cache-dir
 ```
+
+The `--no-cache-dir` flag ensures that the latest git repositories of special dependency projects are imported each 
+time this command is run, given the "research and development" nature of this testing repo.
 
 Note: double check which version of `pip` you have and its relationship to your Python executable. In some contexts, 
 the visible `pip` will not be targeting your python3 binary. A safer way to execute `pip` may therefore be as follows: 
 
 ```
-python3 -m pip install -r requirements.txt
+python3 -m pip install -r requirements.txt --no-cache-dir
 ```
 
 ## Running Local support services for the Behave tests
@@ -71,6 +74,8 @@ You only need to run the backplane and API.
 Behave testing for several test scenarios in the Translator Modules feature testing require access to support web 
 services which need to be running and accessible before running the tests.  Instructions for running these services is 
 [documented here](https://github.com/ncats/translator-modules#special-prerequisite-for-running-the-translator-modules).
+Either the DNS or system environment variables should be set to point to the services as indicated in the section about 
+[support service host name resolution](https://github.com/ncats/translator-modules#service-host-name-resolution).
 
 ## Running Behave tests
 
