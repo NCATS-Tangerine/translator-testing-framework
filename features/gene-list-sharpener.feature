@@ -63,10 +63,10 @@ Feature: Check gene-list sharpener
     Scenario: Check Big GIM expander
         Given the gene-list sharpener
         and a gene list "ADA,EPB41L1,GPX4"
-        when we call "Big GIM expression correlation" transformer with the following parameters:
+        when we call "BigGIM gene-expression correlation" transformer with the following parameters:
             | total | tissue |
             | 10    | liver  |
-        then the response should have some JSONPath "source" with "string" "Big GIM expression correlation"
+        then the response should have some JSONPath "source" with "string" "BigGIM gene-expression correlation"
         and the length of the gene list should be 13
 
 
@@ -98,4 +98,15 @@ Feature: Check gene-list sharpener
             |          0.0009 |            0.05 |
         then the response should have some JSONPath "source" with "string" "MSigDB hypergeometric enrichment expander"
         and the length of the gene list should be 17
+
+
+    Scenario: Check OMIM common-to-rare disease genes producer
+        Given the gene-list sharpener
+        and a gene list "ADA,EPB41L1,GPX4"
+        when we call "OMIM common-to-rare disease genes" transformer with the following parameters:
+            | OMIM disease ID |
+            | MIM:222100      |
+        then the response should have some JSONPath "source" with "string" "OMIM common-to-rare disease genes"
+        and the length of the gene list should be 2648
+
 
