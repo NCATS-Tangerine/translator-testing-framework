@@ -1,4 +1,4 @@
-from ncats.translator.module.disease.gene import disease_associated_genes
+#from ncats.translator.module.disease.gene import disease_associated_genes
 
 @given('a disease term {disease_identifier} for disease label {disease_label} in Translator Modules')
 def step_impl(context, disease_identifier, disease_label):
