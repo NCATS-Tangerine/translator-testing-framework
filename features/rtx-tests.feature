@@ -175,3 +175,12 @@ Feature: Check RTX responses
             | CHEMBL.COMPOUND:CHEMBL1751 | digoxin     |
             | CHEMBL.COMPOUND:CHEMBL27   | propranolol |
             | CHEMBL.COMPOUND:CHEMBL1294 | quinidine   |
+
+    Scenario: Carbetocin physically interacts with oxytocin receptor
+        Given a query graph with the following mappings
+            | source_curie                  | source_type        | edge_type                 | target_curie | target_type |
+            | CHEMBL.COMPOUND:CHEMBL3301668 | chemical_substance | physically_interacts_with |              | protein     |
+        When we send the question to RTX
+        Then the answer graph should contain the following nodes
+            | id               | name |
+            | UniProtKB:P30559 | OXTR |
