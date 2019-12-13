@@ -23,10 +23,3 @@ Feature: Check Translator Module disease associated genes
             When we run the Translator "Functional Similarity" Module
             Then the Translator Module result contains gene identifiers "HGNC:26144,HGNC:18536"
             And the Translator Module result contains gene symbols "RAD54L,FIGNL1,KAT5"
-
-   Scenario: Check Translator Module Gene to Gene Bicluster of RNASeqDb
-        Given the Translator Modules input "genes" "HGNC:1100,HGNC:12829"
-        And module parameters "threshold:0.35"
-            When we run the Translator "Functional Similarity" Module
-            Then the Translator Module result contains gene identifiers "HGNC:26144,HGNC:18536"
-            And the Translator Module result contains gene symbols "RAD54L,FIGNL1,KAT5"
