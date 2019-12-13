@@ -184,3 +184,12 @@ Feature: Check RTX responses
         Then the answer graph should contain the following nodes
             | id               | name |
             | UniProtKB:P30559 | OXTR |
+
+    Scenario: MIR1225 associated with polycystic kidney disease
+        Given a query graph with the following mappings
+            | source_curie | source_type | edge_type                      | target_curie | target_type |
+            |              | microRNA    | gene_associated_with_condition | OMIM:263200  | disease     |
+        When we send the question to RTX
+        Then the answer graph should contain the following nodes
+            | id                 | name    |
+            | NCBIGene:100188847 | MIR1225 |
