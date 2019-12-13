@@ -8,22 +8,20 @@ from ncats.translator.modules.gene.gene.gene_interaction import GeneInteractionS
 @given('the disease identifier "{disease_identifier}" for disease label "{disease_label}" in Translator Modules')
 def step_impl(context, disease_identifier, disease_label):
     print('Given disease identifier '+disease_identifier+' for disease label '+disease_label)
-    context.input_parameters = {"disease_identifier": disease_identifier, "disease_label": disease_label}
+    context.module_input_parameters = {"disease_identifier": disease_identifier, "disease_label": disease_label}
 
 
-@given('the Translator Modules input "{type}" "{identifiers}"')
-def step_impl(context, type, identifiers):
+@given('the Translator Modules input "{input_type}" "{identifiers}"')
+def step_impl(context, input_type, identifiers):
 
-    print('Given input_'+type+' identifiers: '+identifiers)
+    print('Given input_'+input_type+' identifiers: '+identifiers)
 
-    if not context.input_parameters:
-        context.input_parameters = {}
-
-    context.input_parameters.update({"input_"+type: identifiers.split(",")})
+    # We assume that the input_parameters variable is first set here
+    context.module_input_parameters = {"input_"+input_type: identifiers.split(",")}
 
 
 @given('module parameters "{parameters}"')
-def step_impl(context, type, parameters):
+def step_impl(context, parameters):
 
     print('Given module parameters: '+parameters)
 
@@ -33,10 +31,9 @@ def step_impl(context, type, parameters):
     # convert parameter list into a named parameter dictionary
     parameter_dict = {k: v for (k, v) in [p.split(":") for p in parameter_list]}
 
-    if not context.input_parameters:
-        context.input_parameters = {}
-
-    context.input_parameters.update(parameter_dict)
+    # Assume here that parameters are appended to Behave step context.module_input_parameters set in a
+    # previously called step, e.g. @given('the Translator Modules input "{input_type}" "{identifiers}"')
+    context.module_input_parameters.update(parameter_dict)
 
 
 # catalog of package/modules in translator-modules/ncats/translator/modules/
@@ -58,14 +55,25 @@ def step_impl(context, module):
 
     # The 'payload' is a class whose initialization
     # will run the module on the specified input data
-    module = payload(**context.input_parameters)
+    module = payload(**context.module_input_parameters)
     context.results = module.results[['hit_id', 'hit_symbol']].to_dict(orient='records')
 
 
-@then('the Translator Module result contains "{gene_ids}"')
+@then('the Translator Module result contains gene identifiers "{gene_ids}"')
 def step_impl(context, gene_ids):
     print('Then the Translator Module result should contain gene identifiers '+gene_ids)
-    hit_ids = [x["hit_id"] for x in context.results]
+    hit_ids = set([x["hit_id"] for x in context.results])
     gene_ids = gene_ids.split(",")
     for gene in gene_ids:
+        print('Assessing gene: '+gene)
         assert gene in hit_ids
+
+
+@then('the Translator Module result contains gene symbols "{gene_symbols}"')
+def step_impl(context, gene_symbols):
+    print('Then the Translator Module result should contain gene symbols '+gene_symbols)
+    hit_symbols = set([x["hit_symbol"] for x in context.results if isinstance(x, dict)])
+    gene_symbols = gene_symbols.split(",")
+    for symbol in gene_symbols:
+        print('Assessing symbol: ' + symbol)
+        assert symbol in hit_symbols
