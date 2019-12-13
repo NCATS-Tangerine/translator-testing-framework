@@ -17,9 +17,9 @@ Feature: Check Translator Module disease associated genes
             Then the Translator Module result contains gene identifiers "HGNC:12476,HGNC:26144"
             And the Translator Module result contains gene symbols "BRIP1,BARD1,RBBP8"
 
-   # Going to come back to this test later - takes awhile to run(?)
-   # Scenario: Check Translator Module Functional Similarity for Fanconi Anemia
-   #     Given the Translator Modules input "genes" "HGNC:1100,HGNC:12829"
-   #     And module parameters "threshold:0.35"
-   #         When we run the Translator "Functional Similarity" Module
-   #         Then the Translator Module result contains gene identifiers "HGNC:18536,HGNC:1100"
+   Scenario: Check Translator Module Functional Similarity for Fanconi Anemia
+        Given the Translator Modules input "genes" "HGNC:1100,HGNC:12829"
+        And module parameters "threshold:0.35"
+            When we run the Translator "Functional Similarity" Module
+            Then the Translator Module result contains gene identifiers "HGNC:26144,HGNC:18536"
+            And the Translator Module result contains gene symbols "RAD54L,FIGNL1,KAT5"
