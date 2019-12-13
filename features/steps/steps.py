@@ -235,7 +235,7 @@ def step_impl(context):
     status code, and stores the response in context. If the question has been provided in natural language format (in
     context.human_question), it first sends that to RTX for translation into a machine question.
     """
-    rtx_api_url = "https://rtx.ncats.io/api/rtx/v1"
+    rtx_api_url = "https://arax.rtx.ai/api/rtx/v1"
     rtx_headers = {'accept': 'application/json'}
 
     # First translate the natural language question, if there is one
