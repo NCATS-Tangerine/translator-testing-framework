@@ -193,3 +193,12 @@ Feature: Check RTX responses
         Then the answer graph should contain the following nodes
             | id                 | name    |
             | NCBIGene:100188847 | MIR1225 |
+
+    Scenario: Ectodysplasin A associated with hypohidrotic ectodermal dysplasia
+        Given a query graph with the following mappings
+            | source_curie | source_type | edge_type                      | target_curie | target_type |
+            |              | protein     | gene_associated_with_condition | DOID:14793   | disease     |
+        When we send the question to RTX
+        Then the answer graph should contain the following nodes
+            | id               | name |
+            | UniProtKB:Q92838 | EDA  |
