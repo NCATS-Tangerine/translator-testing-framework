@@ -23,3 +23,27 @@ Feature: Check Translator Module disease associated genes
             When we run the Translator "Functional Similarity" Module
             Then the Translator Module result contains gene identifiers "HGNC:26144,HGNC:18536"
             And the Translator Module result contains gene symbols "RAD54L,FIGNL1,KAT5"
+
+   Scenario: Check Translator Module Gene to Gene Bicluster of RNASeqDb
+        Given the following Translator Modules input "genes" identifiers
+            | identifier      |
+            | ENSG00000121410 |
+            | ENSG00000268895 |
+            | ENSG00000148584 |
+            | ENSG00000070018 |
+            | ENSG00000175899 |
+            | ENSG00000245105 |
+            | ENSG00000166535 |
+            | ENSG00000256661 |
+            | ENSG00000256904 |
+            | ENSG00000256069 |
+            | ENSG00000234906 |
+            | ENSG00000068305 |
+            | ENSG00000070018 |
+            When we run the Translator "Gene to Gene Bicluster RNAseqDB" Module
+            Then the Translator Module result contains the following gene identifiers
+                | identifier      |
+                | ENSG00000182150 |
+                | ENSG00000118058 |
+                | ENSG00000031081|
+                | ENSG00000100320 |
