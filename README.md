@@ -125,6 +125,13 @@ behave -i features/check-reasoners.feature
 To only run TranQL specific tests, run 
 `behave features/tranql-invalid-schema.feature features/tranql-reasoners.feature` in the root directory.
 
+The behave outputs may be controlled with a variety of flags. Try:
+
+```shell
+behave  --no-capture --no-capture-stderr --no-color -i features/check-reasoners.feature
+```
+
+
 ## Run with Docker
 
 ```shell

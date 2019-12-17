@@ -24,7 +24,7 @@ def step_impl(context, input_type, identifiers):
 @given('the following Translator Modules input "{input_type}" identifiers')
 def step_impl(context, input_type):
 
-    print('Given input_'+input_type+' identifiers table')
+    print('Given following Translator Modules input_'+input_type+' identifiers:')
 
     identifiers = set()
     for row in context.table:
@@ -72,7 +72,7 @@ def step_impl(context, module):
     # The 'payload' is a class whose initialization
     # will run the module on the specified input data
     module = payload(**context.module_input_parameters)
-    context.results = module.results[['hit_id', 'hit_symbol']].to_dict(orient='records')
+    context.results = module.results[['hit_id']].to_dict(orient='records')
 
 
 @then('the Translator Module result contains gene identifiers "{gene_ids}"')
@@ -96,10 +96,10 @@ def object_id(curie):
     else:
         part = [curie]
 
-    if '.' in part[0]:
-        part2 = part[0].split(".")
+    if '.' in part[1]:
+        part2 = part[1].split(".")
     else:
-        part2 = [part[0]]
+        part2 = [part[1]]
 
     return part2[0]
 
@@ -107,7 +107,7 @@ def object_id(curie):
 @then('the Translator Module result contains the following gene identifiers')
 def step_impl(context):
 
-    print('Then the Translator Module result contains the following gene identifiers')
+    print('Then the Translator Module result contains the following gene identifiers:')
 
     hit_ids = set([object_id(x["hit_id"]) for x in context.results])
 
