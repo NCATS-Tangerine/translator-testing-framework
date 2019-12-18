@@ -77,7 +77,7 @@ def step_impl(context, module):
     # The 'payload' is a class whose initialization
     # will run the module on the specified input data
     module = payload(**context.module_input_parameters)
-    context.results = module.results[['hit_id']].to_dict(orient='records')
+    context.results = module.results[['hit_id', 'hit_symbol']].to_dict(orient='records')
 
 
 @then('the Translator Module result contains gene identifiers "{gene_ids}"')
