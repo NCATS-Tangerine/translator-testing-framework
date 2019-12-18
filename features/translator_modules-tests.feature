@@ -47,3 +47,21 @@ Feature: Check Translator Module disease associated genes
                 | ENSG00000118058 |
                 | ENSG00000031081 |
                 | ENSG00000100320 |
+
+   Scenario: Check Translator Module Gene to Gene Bicluster of DepMap
+        Given the following Translator Modules input "genes" identifiers
+            | identifier  |
+            | NCBI:214    |
+            | NCBI:84896  |
+            | NCBI:55299  |
+            | NCBI:9184   |
+            | NCBI:144608 |
+            When we run the Translator "Gene to Gene Bicluster DepMap" Module
+            Then the Translator Module result contains the following gene identifiers
+                | identifier  |
+                | NCBI:414060 |
+                | NCBI:1022   |
+                | NCBI:5713   |
+                | NCBI:81050  |
+                | NCBI:5687   |
+                | NCBI:51188  |
