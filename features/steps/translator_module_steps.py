@@ -1,9 +1,13 @@
 from behave import given, when, then
+
+from ncats.translator.identifiers import object_id
+
 from ncats.translator.modules.disease.gene.disease_associated_genes import DiseaseAssociatedGeneSet
 from ncats.translator.modules.gene.gene.functional_similarity import FunctionallySimilarGenes
 from ncats.translator.modules.gene.gene.phenotype_similarity import PhenotypicallySimilarGenes
 from ncats.translator.modules.gene.gene.gene_interaction import GeneInteractionSet
 from ncats.translator.modules.gene.gene.gene_to_gene_bicluster_RNAseqDB import GeneToGeneRNASeqDbBiclusters
+from ncats.translator.modules.gene.gene.gene_to_gene_bicluster_DepMap import GeneToGeneDepMapBiclusters
 
 
 @given('the disease identifier "{disease_identifier}" for disease label "{disease_label}" in Translator Modules')
@@ -58,6 +62,7 @@ _translator_modules = {
     "Phenotype Similarity": PhenotypicallySimilarGenes,  # gene/gene
     "Gene Interaction": GeneInteractionSet,  # gene/gene
     "Gene to Gene Bicluster RNAseqDB": GeneToGeneRNASeqDbBiclusters,  # gene/gene
+    "Gene to Gene Bicluster DepMap": GeneToGeneDepMapBiclusters,  # gene/gene
 }
 
 
@@ -89,21 +94,6 @@ def step_impl(context, gene_ids):
         assert gene in hit_ids
 
 
-def object_id(curie):
-
-    if ':' in curie:
-        part = curie.split(":")
-    else:
-        part = [curie]
-
-    if '.' in part[1]:
-        part2 = part[1].split(".")
-    else:
-        part2 = [part[1]]
-
-    return part2[0]
-
-
 @then('the Translator Module result contains the following gene identifiers')
 def step_impl(context):
 
@@ -118,7 +108,9 @@ def step_impl(context):
 
     for gene in gene_ids:
         print('Assessing gene: '+gene)
-        assert gene in hit_ids
+        # Only attempt exact match on the core
+        # object_id, without xmlns prefix and versioning
+        assert object_id(gene) in hit_ids
 
 
 @then('the Translator Module result contains gene symbols "{gene_symbols}"')

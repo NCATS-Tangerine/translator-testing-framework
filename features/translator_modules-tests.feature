@@ -45,5 +45,5 @@ Feature: Check Translator Module disease associated genes
                 | identifier      |
                 | ENSG00000182150 |
                 | ENSG00000118058 |
-                | ENSG00000031081|
+                | ENSG00000031081 |
                 | ENSG00000100320 |
