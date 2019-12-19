@@ -8,6 +8,7 @@ from ncats.translator.modules.gene.gene.phenotype_similarity import Phenotypical
 from ncats.translator.modules.gene.gene.gene_interaction import GeneInteractionSet
 from ncats.translator.modules.gene.gene.gene_to_gene_bicluster_RNAseqDB import GeneToGeneRNASeqDbBiclusters
 from ncats.translator.modules.gene.gene.gene_to_gene_bicluster_DepMap import GeneToGeneDepMapBiclusters
+from ncats.translator.modules.chemical_substance.gene.chemical_to_gene_interaction import ChemicalToGeneInteractionPayload
 
 
 @given('the disease identifier "{disease_identifier}" for disease label "{disease_label}" in Translator Modules')
@@ -19,16 +20,16 @@ def step_impl(context, disease_identifier, disease_label):
 @given('the Translator Modules input "{input_type}" "{identifiers}"')
 def step_impl(context, input_type, identifiers):
 
-    print('Given input_'+input_type+' identifiers: '+identifiers)
+    print('Given input_'+input_type+'s identifiers: '+identifiers)
 
     # We assume that the input_parameters variable is first set here
-    context.module_input_parameters = {"input_"+input_type: identifiers.split(",")}
+    context.module_input_parameters = {"input_"+input_type+"s": identifiers.split(",")}
 
 
 @given('the following Translator Modules input "{input_type}" identifiers')
 def step_impl(context, input_type):
 
-    print('Given following Translator Modules input_'+input_type+' identifiers:')
+    print('Given following Translator Modules input_'+input_type+'s identifiers:')
 
     identifiers = set()
     for row in context.table:
@@ -36,7 +37,7 @@ def step_impl(context, input_type):
         identifiers.add(row['identifier'])
 
     # We assume that the input_parameters variable is first set here
-    context.module_input_parameters = {"input_"+input_type: identifiers}
+    context.module_input_parameters = {"input_"+input_type+"s": identifiers}
 
 
 @given('module parameters "{parameters}"')
@@ -63,6 +64,7 @@ _translator_modules = {
     "Gene Interaction": GeneInteractionSet,  # gene/gene
     "Gene to Gene Bicluster RNAseqDB": GeneToGeneRNASeqDbBiclusters,  # gene/gene
     "Gene to Gene Bicluster DepMap": GeneToGeneDepMapBiclusters,  # gene/gene
+    "Chemical to Gene Interaction": ChemicalToGeneInteractionPayload,  # chemical_substance/gene
 }
 
 
@@ -80,37 +82,36 @@ def step_impl(context, module):
     context.results = module.results[['hit_id', 'hit_symbol']].to_dict(orient='records')
 
 
-@then('the Translator Module result contains gene identifiers "{gene_ids}"')
-def step_impl(context, gene_ids):
+@then('the Translator Module result contains "{input_type}" identifiers "{target_identifiers}"')
+def step_impl(context, input_type, target_identifiers):
 
-    print('Then the Translator Module result should contain gene identifiers '+gene_ids)
+    print('Then the Translator Module result should contain '+input_type+' identifiers '+target_identifiers)
 
     hit_ids = set([x["hit_id"] for x in context.results])
 
-    gene_ids = gene_ids.split(",")
+    target_identifiers = target_identifiers.split(",")
 
-    for gene in gene_ids:
-        print('Assessing gene: '+gene)
-        assert gene in hit_ids
+    for identifier in target_identifiers:
+        print('Assessing identifier: '+identifier)
+        assert identifier in hit_ids
 
 
-@then('the Translator Module result contains the following gene identifiers')
-def step_impl(context):
+@then('the Translator Module result contains the following "{input_type}" identifiers')
+def step_impl(context, input_type):
 
-    print('Then the Translator Module result contains the following gene identifiers:')
+    print('Then the Translator Module result contains the following '+input_type+' identifiers:')
 
+    # Only attempt exact match on the core object_id, without xmlns prefix and version
     hit_ids = set([object_id(x["hit_id"]) for x in context.results])
 
-    gene_ids = set()
+    target_identifiers = set()
     for row in context.table:
         print(row['identifier'])
-        gene_ids.add(row['identifier'])
+        target_identifiers.add(row['identifier'])
 
-    for gene in gene_ids:
-        print('Assessing gene: '+gene)
-        # Only attempt exact match on the core
-        # object_id, without xmlns prefix and versioning
-        assert object_id(gene) in hit_ids
+    for identifier in target_identifiers:
+        print('Assessing identifier: '+identifier)
+        assert object_id(identifier) in hit_ids
 
 
 @then('the Translator Module result contains gene symbols "{gene_symbols}"')
