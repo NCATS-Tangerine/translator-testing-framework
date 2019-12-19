@@ -218,3 +218,16 @@ Feature: Check RTX responses
         Then the answer graph should contain the following nodes
             | id               | name   |
             | UniProtKB:P47989 | xanthine dehydrogenase  |
+    
+    Scenario: AKT serine/threonine kinase 1 participates in Phenylketonuria pathway
+        Given the machine question
+        """
+        {
+            "query_type_id": "Q63",
+            "terms": {
+                "protein": "UniProtKB:P31749"
+            }
+        }
+        """
+        When we send the question to RTX
+        Then the answer graph should include node "REACT:R-HSA-2160456 (Phenylketonuria)"
