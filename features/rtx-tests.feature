@@ -175,3 +175,59 @@ Feature: Check RTX responses
             | CHEMBL.COMPOUND:CHEMBL1751 | digoxin     |
             | CHEMBL.COMPOUND:CHEMBL27   | propranolol |
             | CHEMBL.COMPOUND:CHEMBL1294 | quinidine   |
+
+    Scenario: Carbetocin physically interacts with oxytocin receptor
+        Given a query graph with the following mappings
+            | source_curie                  | source_type        | edge_type                 | target_curie | target_type |
+            | CHEMBL.COMPOUND:CHEMBL3301668 | chemical_substance | physically_interacts_with |              | protein     |
+        When we send the question to RTX
+        Then the answer graph should contain the following nodes
+            | id               | name |
+            | UniProtKB:P30559 | OXTR |
+
+    Scenario: MIR1225 associated with polycystic kidney disease
+        Given a query graph with the following mappings
+            | source_curie | source_type | edge_type                      | target_curie | target_type |
+            |              | microRNA    | gene_associated_with_condition | OMIM:263200  | disease     |
+        When we send the question to RTX
+        Then the answer graph should contain the following nodes
+            | id                 | name    |
+            | NCBIGene:100188847 | MIR1225 |
+
+    Scenario: Ectodysplasin A associated with hypohidrotic ectodermal dysplasia
+        Given a query graph with the following mappings
+            | source_curie | source_type | edge_type                      | target_curie | target_type |
+            |              | protein     | gene_associated_with_condition | DOID:14793   | disease     |
+        When we send the question to RTX
+        Then the answer graph should contain the following nodes
+            | id               | name |
+            | UniProtKB:Q92838 | EDA  |
+
+    Scenario: Metabolite PGG2 physically interacts with Protein PTGS1
+        Given a query graph with the following mappings
+            | source_curie                  | source_type        | edge_type                 | target_curie | target_type |
+            | UniProtKB:P23219 | protein | physically_interacts_with |              | metabolite     |
+        When we send the question to RTX
+        Then the answer graph should contain the following nodes
+            | id               | name |
+            | KEGG:C05956 | Prostaglandin G2 |
+    
+    Scenario: ileum is associated with nitric oxide
+        Given the "English" question "What anatomy are associated with nitric oxide?"
+        When we send the question to RTX
+        Then the answer graph should contain the following nodes
+            | id               | name   |
+            | UniProtKB:P47989 | xanthine dehydrogenase  |
+    
+    Scenario: AKT serine/threonine kinase 1 participates in Phenylketonuria pathway
+        Given the machine question
+        """
+        {
+            "query_type_id": "Q63",
+            "terms": {
+                "protein": "UniProtKB:P31749"
+            }
+        }
+        """
+        When we send the question to RTX
+        Then the answer graph should include node "REACT:R-HSA-2160456 (Phenylketonuria)"
