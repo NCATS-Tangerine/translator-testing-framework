@@ -80,3 +80,19 @@ Feature: Check Translator Module disease associated genes
                 | NCBIGene:25     |
                 | NCBIGene:154    |
                 | NCBIGene:241    |
+
+   Scenario: Check Translator Module gene_to_chemical_interaction
+        Given the following Translator Modules input "gene" identifiers
+            | identifier    |
+            | NCBIGene:4149 |
+            | NCBIGene:4609 |
+            | NCBIGene:3785 |
+            When we run the Translator "Gene to Chemical Interaction" Module
+            Then the Translator Module result contains the following "chemical" identifiers
+                | identifier  |
+                | CTD:C459179 |
+                | CTD:C101866 |
+                | CTD:D004317 |
+                | CTD:D001335 |
+                | CTD:C510786 |
+                | CTD:D000111 |
