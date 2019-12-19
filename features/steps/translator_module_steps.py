@@ -8,6 +8,7 @@ from ncats.translator.modules.gene.gene.phenotype_similarity import Phenotypical
 from ncats.translator.modules.gene.gene.gene_interaction import GeneInteractionSet
 from ncats.translator.modules.gene.gene.gene_to_gene_bicluster_RNAseqDB import GeneToGeneRNASeqDbBiclusters
 from ncats.translator.modules.gene.gene.gene_to_gene_bicluster_DepMap import GeneToGeneDepMapBiclusters
+from ncats.translator.modules.gene.chemical_substance.gene_to_chemical_interaction import GeneToChemicalInteractionPayload
 from ncats.translator.modules.chemical_substance.gene.chemical_to_gene_interaction import ChemicalToGeneInteractionPayload
 
 
@@ -65,6 +66,7 @@ _translator_modules = {
     "Gene to Gene Bicluster RNAseqDB": GeneToGeneRNASeqDbBiclusters,  # gene/gene
     "Gene to Gene Bicluster DepMap": GeneToGeneDepMapBiclusters,  # gene/gene
     "Chemical to Gene Interaction": ChemicalToGeneInteractionPayload,  # chemical_substance/gene
+    "Gene to Chemical Interaction": GeneToChemicalInteractionPayload,  # gene/chemical_substance
 }
 
 
