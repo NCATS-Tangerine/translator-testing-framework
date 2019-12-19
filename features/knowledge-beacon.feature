@@ -1,14 +1,14 @@
-Feature: Check Rhea Knowledge beacons
+Feature: Check Knowledge Beacons
 
     Scenario: Check Rhea Beacon categories
         Given a knowledge source at "https://kba.ncats.io/beacon/rhea"
         When we fire "/categories" query
-        Then the response contains the following entries in "category":
+        Then the response contains the following entries in "category"
             | category                   |
             | chemical substance         |
             | protein                    |
             | molecular activity         |
-        And the response only contains the following entries in "category":
+        And the response only contains the following entries in "category"
             | category                   |
             | chemical substance         |
             | protein                    |
@@ -17,7 +17,7 @@ Feature: Check Rhea Knowledge beacons
     Scenario: Check Rhea Beacon predicates
         Given a knowledge source at "https://kba.ncats.io/beacon/rhea"
         When we fire "/predicates" query
-        Then the response contains the following entries in "relation":
+        Then the response contains the following entries in "relation"
             | relation                                                     |
             | participates in the same reaction side as                    |
             | participates in the opposite reaction side as                |
@@ -27,7 +27,7 @@ Feature: Check Rhea Knowledge beacons
             | increases_activity_of                                        |
             | catalyzes same reaction as                                   |
             | has same catalyst                                            |
-        And the response only contains the following entries in "relation":
+        And the response only contains the following entries in "relation"
             | relation                                                     |
             | participates in the same reaction side as                    |
             | participates in the opposite reaction side as                |
@@ -37,7 +37,7 @@ Feature: Check Rhea Knowledge beacons
             | increases_activity_of                                        |
             | catalyzes same reaction as                                   |
             | has same catalyst                                            |
-        And the response contains the following entries in "edge_label":
+        And the response contains the following entries in "edge_label"
             | edge_label                 |
             | molecularly_interacts_with |
             | derives_into               |
@@ -46,7 +46,7 @@ Feature: Check Rhea Knowledge beacons
             | participates_in            |
             | increases_activity_of      |
             | related_to                 |
-        And the response only contains the following entries in "edge_label":
+        And the response only contains the following entries in "edge_label"
             | edge_label                 |
             | molecularly_interacts_with |
             | derives_into               |
@@ -59,10 +59,10 @@ Feature: Check Rhea Knowledge beacons
     Scenario: Check Rhea Beacon Name Space
         Given a knowledge source at "https://kba.ncats.io/beacon/rhea"
         When we fire "/namespaces" query
-        Then the response contains the following entries in "local_prefix":
+        Then the response contains the following entries in "local_prefix"
             | local_prefix |
             | RHEA         |
-        And the response only contains the following entries in "local_prefix":
+        And the response only contains the following entries in "local_prefix"
             | local_prefix |
             | RHEA         |
 
@@ -70,17 +70,17 @@ Feature: Check Rhea Knowledge beacons
     Scenario: Check Rhea Beacon Knowledge Map
         Given a knowledge source at "https://kba.ncats.io/beacon/rhea"
         When we fire "/kmap" query
-        Then the response contains the following entries in "category" of "subject":
+        Then the response contains the following entries in "category" of "subject"
             | category                   |
             | chemical substance         |
             | protein                    |
             | molecular activity         |
-        And the response only contains the following entries in "category" of "subject":
+        And the response only contains the following entries in "category" of "subject"
             | category                   |
             | chemical substance         |
             | protein                    |
             | molecular activity         |
-        And the response contains the following entries in "relation" of "predicate":
+        And the response contains the following entries in "relation" of "predicate"
             | relation                                                     |
             | participates in the same reaction side as                    |
             | participates in the opposite reaction side as                |
@@ -90,7 +90,7 @@ Feature: Check Rhea Knowledge beacons
             | increases_activity_of                                        |
             | catalyzes same reaction as                                   |
             | has same catalyst                                            |
-        And the response only contains the following entries in "relation" of "predicate":
+        And the response only contains the following entries in "relation" of "predicate"
             | relation                                                     |
             | participates in the same reaction side as                    |
             | participates in the opposite reaction side as                |
@@ -100,7 +100,7 @@ Feature: Check Rhea Knowledge beacons
             | increases_activity_of                                        |
             | catalyzes same reaction as                                   |
             | has same catalyst                                            |
-        And the response contains the following entries in "edge_label" of "predicate":
+        And the response contains the following entries in "edge_label" of "predicate"
             | edge_label                 |
             | molecularly_interacts_with |
             | derives_into               |
@@ -109,7 +109,7 @@ Feature: Check Rhea Knowledge beacons
             | participates_in            |
             | increases_activity_of      |
             | related_to                 |
-        And the response only contains the following entries in "edge_label" of "predicate":
+        And the response only contains the following entries in "edge_label" of "predicate"
             | edge_label                 |
             | molecularly_interacts_with |
             | derives_into               |
@@ -118,12 +118,12 @@ Feature: Check Rhea Knowledge beacons
             | participates_in            |
             | increases_activity_of      |
             | related_to                 |
-        And the response contains the following entries in "category" of "object":
+        And the response contains the following entries in "category" of "object"
             | category                   |
             | chemical substance         |
             | protein                    |
             | molecular activity         |
-        And the response only contains the following entries in "category" of "object":
+        And the response only contains the following entries in "category" of "object"
             | category                   |
             | chemical substance         |
             | protein                    |
@@ -151,18 +151,18 @@ Feature: Check Rhea Knowledge beacons
     Scenario: Check Rhea Beacon statements
         Given a knowledge source at "https://kba.ncats.io/beacon/rhea"
         When we fire "/statements?s=EC%3A3.1.1.55" query
-        Then the response only contains the following entries in "id" of "subject":
+        Then the response only contains the following entries in "id" of "subject"
             | id          |
             | EC:3.1.1.55 |
-        And the response only contains the following entries in "name" of "subject":
+        And the response only contains the following entries in "name" of "subject"
             | name                         |
             | Acetylsalicylate deacetylase.|
-        And the response only contains the following entries in "edge_label" of "predicate":
+        And the response only contains the following entries in "edge_label" of "predicate"
             | edge_label               |
             | increases_synthesis_of   |
             | increases_degradation_of |
             | increases_activity_of    |
-        And the response only contains the following entries in "id" of "object":
+        And the response only contains the following entries in "id" of "object"
             | id          |
             | CHEBI:30762 |
             | CHEBI:15378 |
@@ -174,13 +174,13 @@ Feature: Check Rhea Knowledge beacons
     Scenario: Check SMPDB Beacon categories
         Given a knowledge source at "https://kba.ncats.io/beacon/smpdb"
         When we fire "/categories" query
-        Then the response contains the following entries in "category":
+        Then the response contains the following entries in "category"
             | category           |
             | chemical substance |
             | metabolite         |
             | pathway            |
             | protein            |
-        And the response only contains the following entries in "category":
+        And the response only contains the following entries in "category"
             | category           |
             | chemical substance |
             | metabolite         |
@@ -190,7 +190,7 @@ Feature: Check Rhea Knowledge beacons
     Scenario: Check SMPDB Beacon predicates
         Given a knowledge source at "https://kba.ncats.io/beacon/smpdb"
         When we fire "/predicates" query
-        Then the response contains the following entries in "relation":
+        Then the response contains the following entries in "relation"
             | relation                        |
             | chemical_affects                |
             | controls_transport_of           |
@@ -206,7 +206,7 @@ Feature: Check Rhea Knowledge beacons
             | controls_state_change_of        |
             | neighbor_of                     |
             | reacts_with                     |
-        And the response only contains the following entries in "relation":
+        And the response only contains the following entries in "relation"
             | relation                        |
             | chemical_affects                |
             | controls_transport_of           |
@@ -222,7 +222,7 @@ Feature: Check Rhea Knowledge beacons
             | controls_state_change_of        |
             | neighbor_of                     |
             | reacts_with                     |
-        And the response contains the following entries in "edge_label":
+        And the response contains the following entries in "edge_label"
             | edge_label                      |
             | affects                         |
             | affects_transport_of            |
@@ -233,7 +233,7 @@ Feature: Check Rhea Knowledge beacons
             | precedes                        |
             | produces                        |
             | related_to                      |
-        And the response only contains the following entries in "edge_label":
+        And the response only contains the following entries in "edge_label"
             | edge_label                      |
             | affects                         |
             | affects_transport_of            |
@@ -248,11 +248,11 @@ Feature: Check Rhea Knowledge beacons
     Scenario: Check SMPDB Beacon Name Space
         Given a knowledge source at "https://kba.ncats.io/beacon/smpdb"
         When we fire "/namespaces" query
-        Then the response contains the following entries in "local_prefix":
+        Then the response contains the following entries in "local_prefix"
             | local_prefix |
             | CHEBI        |
             | HMDB         |
-        And the response only contains the following entries in "local_prefix":
+        And the response only contains the following entries in "local_prefix"
             | local_prefix |
             | CHEBI        |
             | HMDB         |
@@ -260,19 +260,18 @@ Feature: Check Rhea Knowledge beacons
     Scenario: Check SMPDB Beacon Knowledge Map
         Given a knowledge source at "https://kba.ncats.io/beacon/smpdb"
         When we fire "/kmap" query
-        Then the response contains the following entries in "category" of "subject":
+        Then the response contains the following entries in "category" of "subject"
+            | category           |
+            | chemical substance |
+            | metabolite         |
+            | protein            |
+        And the response only contains the following entries in "category" of "subject"
             | category           |
             | chemical substance |
             | metabolite         |
             | pathway            |
             | protein            |
-        And the response only contains the following entries in "category" of "subject":
-            | category           |
-            | chemical substance |
-            | metabolite         |
-            | pathway            |
-            | protein            |
-        And the response contains the following entries in "relation" of "predicate":
+        And the response contains the following entries in "relation" of "predicate"
             | relation                        |
             | chemical_affects                |
             | controls_transport_of           |
@@ -288,7 +287,7 @@ Feature: Check Rhea Knowledge beacons
             | controls_state_change_of        |
             | neighbor_of                     |
             | reacts_with                     |
-        And the response only contains the following entries in "relation" of "predicate":
+        And the response only contains the following entries in "relation" of "predicate"
             | relation                        |
             | chemical_affects                |
             | controls_transport_of           |
@@ -304,7 +303,7 @@ Feature: Check Rhea Knowledge beacons
             | controls_state_change_of        |
             | neighbor_of                     |
             | reacts_with                     |
-        And the response contains the following entries in "edge_label" of "predicate":
+        And the response contains the following entries in "edge_label" of "predicate"
             | edge_label                      |
             | affects                         |
             | affects_transport_of            |
@@ -315,7 +314,7 @@ Feature: Check Rhea Knowledge beacons
             | precedes                        |
             | produces                        |
             | related_to                      |
-        And the response only contains the following entries in "edge_label" of "predicate":
+        And the response only contains the following entries in "edge_label" of "predicate"
             | edge_label                      |
             | affects                         |
             | affects_transport_of            |
@@ -326,13 +325,13 @@ Feature: Check Rhea Knowledge beacons
             | precedes                        |
             | produces                        |
             | related_to                      |
-        And the response contains the following entries in "category" of "object":
+        And the response contains the following entries in "category" of "object"
             | category           |
             | chemical substance |
             | metabolite         |
             | pathway            |
             | protein            |
-        And the response only contains the following entries in "category" of "object":
+        And the response only contains the following entries in "category" of "object"
             | category           |
             | chemical substance |
             | metabolite         |
@@ -343,7 +342,7 @@ Feature: Check Rhea Knowledge beacons
         Given a knowledge source at "https://kba.ncats.io/beacon/smpdb"
         When we fire "/concepts?keywords=acetaldehyde" query
         Then the response contains "metabolite" in "categories"
-        And the response contains the following entries in "id":
+        And the response contains the following entries in "id"
             | id          |
             | CHEBI:27978 |
             | CHEBI:15343 |
@@ -352,7 +351,7 @@ Feature: Check Rhea Knowledge beacons
             | CHEBI:50157 |
             | CHEBI:18086 |
             | CHEBI:27871 |
-        And the response contains the following entries in "name":
+        And the response contains the following entries in "name"
             | name                            |
             | 3,4-Dihydroxyphenylacetaldehyde |
             | Acetaldehyde                    |
@@ -379,31 +378,31 @@ Feature: Check Rhea Knowledge beacons
     Scenario: Check SMPDB Beacon statements
         Given a knowledge source at "https://kba.ncats.io/beacon/smpdb"
         When we fire "/statements?s=CHEBI%3A18086" query
-        Then the response only contains the following entries in "id" of "subject":
+        Then the response only contains the following entries in "id" of "subject"
             | id          |
             | CHEBI:18086 |
-        And the response only contains the following entries in "name" of "subject":
+        And the response only contains the following entries in "name" of "subject"
             | name               |
             | Indoleacetaldehyde |
-        And the response only contains the following entries in "edge_label" of "predicate":
+        And the response only contains the following entries in "edge_label" of "predicate"
             | edge_label                      |
             | produces                        |
             | in_pathway_with                 |
             | related_to                      |
             | chemical_to_pathway_association |
-        And the response only contains the following entries in "id" of "object":
-            | id          |
-            | CHEBI:16411 |
-            | CHEBI:27823 |
+        And the response only contains the following entries in "id" of "object"
+            | id             |
+            | CHEBI:16411    |
+            | CHEBI:27823    |
             | UNIPROT:P46597 |
             | UNIPROT:P05091 |
-            | CHEBI:28715 |
-            | UNIPROT:O15229  |
+            | CHEBI:28715    |
+            | UNIPROT:O15229 |
             | UNIPROT:O95050 |
-            | SMP:SMP0000063 |
-    | CHEBI:28715 |
+            | CHEBI:995      |
             | UNIPROT:Q8TDX5 |
-        And the response only contains the following entries in "name" of "object":
+            | SMP:SMP0000063 |
+        And the response only contains the following entries in "name" of "object"
             | name              |
             | Indoleacetic acid |
             | 5-Hydroxyindoleacetic acid |

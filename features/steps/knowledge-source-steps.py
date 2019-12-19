@@ -59,15 +59,23 @@ def step_impl(context, key):
 
 
 @then('the response contains "{value}" in "{key}"')
-def step_impl(context, key, value):
+def step_impl(context, value, key):
     """
     This step checks whether all values specified in the test are contained in the response
     """
     entries = set()
     print('Collected entries:')
     for entry in context.response_json:
-        print(' ', entry[key])
-        entries.add(entry[key])
+        field_value = entry[key]
+        # Some fields may be a list of values
+        if isinstance(field_value, list):
+            for item in field_value:
+                print(' ', item)
+                entries.add(item)
+        else:  # assume a simple scalar
+            print(' ', field_value)
+            entries.add(field_value)
+
     print('Tested entry:')
     print(' ', value)
     assert value in entries
@@ -81,8 +89,16 @@ def step_impl(context, key, parent):
     entries = set()
     print('Collected entries:')
     for row in context.table:
-        print(' ', row[key])
-        entries.add(row[key])
+        field_value = row[key]
+        # Some fields may be a list of values
+        if isinstance(field_value, list):
+            for item in field_value:
+                print(' ', item)
+                entries.add(item)
+        else:  # assume a simple scalar
+            print(' ', field_value)
+            entries.add(field_value)
+
     print('Tested entries:')
     for entry in context.response_json:
         print(' ', entry[parent][key])
