@@ -1,4 +1,6 @@
-Feature: Tests for the RTX reasoning tool
+Feature: Check RTX responses
+
+    # NOTE: For tables, the 'name' column is always optional (it is simply there for readability)
 
     Scenario: Fanconi anemia is associated with expected genes
         Given the "English" question "What genes are associated with Fanconi anemia?"
@@ -68,3 +70,108 @@ Feature: Tests for the RTX reasoning tool
             | UniProtKB:P46531 | NOTCH1   |
             | UniProtKB:Q06330 | RBPJ     |
             | UniProtKB:Q9NR61 | DLL4     |
+
+    Scenario: Kawasaki disease has expected symptoms
+        Given a query graph with the following mappings
+            | source_curie | source_type | edge_type     | target_curie | target_type        |
+            | DOID:13378   | disease     | has_phenotype |              | phenotypic_feature |
+        When we send the question to RTX
+        Then the answer graph should contain the following nodes
+            | id         | name            |
+            | HP:0001945 | fever           |
+            | HP:0003116 | abnormal EKG    |
+            | HP:0000988 | skin rash       |
+            | HP:0002716 | lymphadenopathy |
+
+    Scenario: Kawasaki disease is associated with expected genes
+        Given a query graph with the following mappings
+            | source_curie | source_type | edge_type                      | target_curie | target_type |
+            |              | protein     | gene_associated_with_condition | DOID:13378   | disease     |
+        When we send the question to RTX
+        Then the answer graph should contain the following nodes
+            | id               | name     |
+            | UniProtKB:P12318 | FCGR2A   |
+            | UniProtKB:Q96DU7 | ITPKC    |
+
+    Scenario: TNFRSF11B binds TNFRSF11A
+        Given a query graph with the following mappings
+            | source_curie     | source_type | edge_type                 | target_curie | target_type |
+            | UniProtKB:O00300 | protein     | physically_interacts_with |              | protein     |
+        When we send the question to RTX
+        Then the answer graph should include node "UniProtKB:Q9Y6Q6 (TNFRSF11A)"
+
+    Scenario: TNFRSF11A/TNFRSF11B similarity check
+        Given the "English" question "What proteins involve similar biological processes as TNFRSF11A?"
+        When we send the question to RTX
+        Then the results should include node "UniProtKB:O00300 (TNFRSF11B)" with similarity value > 0.2
+
+    Scenario: Congenital diaphragmatic hernia is associated with GATA4
+        Given a query graph with the following mappings
+            | source_curie | source_type | edge_type                      | target_curie | target_type |
+            |              | protein     | gene_associated_with_condition |  DOID:3827   | disease     |
+        When we send the question to RTX
+        Then the answer graph should include node "DOID:3827 (GATA4)"
+
+    Scenario: Ehlers-Danlos has subtypes I and III
+        Given a query graph with the following mappings
+            | source_curie  | source_type | edge_type   | target_curie | target_type |
+            |               | disease     | subclass_of | DOID:13359   | disease     |
+        When we send the question to RTX
+        Then the answer graph should contain the following nodes
+            | id         | name         |
+            | DOID:14757 | type III EDS |
+            | DOID:14720 | type I EDS   |
+
+    Scenario: Smith-Kingsmore has expected symptoms
+        Given a query graph with the following mappings
+            | source_curie  | source_type | edge_type     | target_curie | target_type        |
+            | OMIM:616638   | disease     | has_phenotype |              | phenotypic_feature |
+        When we send the question to RTX
+        Then the answer graph should contain the following nodes
+            | id         | name                    |
+            | HP:0000256 | macrocephaly            |
+            | HP:0001249 | intellectual disability |
+            | HP:0001250 | seizures                |
+
+    Scenario: Smith-Kingsmore is caused by MTOR mutation
+        Given a query graph with the following mappings
+            | source_curie | source_type | edge_type                    | target_curie | target_type |
+            |              | protein     | gene_mutations_contribute_to | OMIM:616638  | disease     |
+        When we send the question to RTX
+        Then the answer graph should include node "UniProtKB:P42345 (MTOR)"
+
+    Scenario: AKT1 regulates MTOR
+        Given a query graph with the following mappings
+            | source_curie | source_type | edge_type | target_curie     | target_type |
+            |              | protein     | regulates | UniProtKB:P42345 | protein     |
+        When we send the question to RTX
+        Then the answer graph should include node "UniProtKB:P31749 (AKT1)"
+
+    Scenario: TSC1 mutation causes Tuberous Sclerosis Complex
+        Given a query graph with the following mappings
+            | source_curie | source_type | edge_type                    | target_curie | target_type |
+            |              | protein     | gene_mutations_contribute_to | OMIM:191100  | disease     |
+        When we send the question to RTX
+        Then the answer graph should include node "UniProtKB:Q92574 (TSC1)"
+
+    Scenario: SLC16A11 is expressed in expected cellular components/anatomical entities
+        Given a query graph with the following mappings
+            | source_curie     | source_type | edge_type    | target_curie | target_type        |
+            | UniProtKB:Q8NCK7 | protein     | expressed_in |              |                    |
+        When we send the question to RTX
+        Then the answer graph should contain the following nodes
+            | id             | name                           |
+            | GO:0005886     | plasma membrane                |
+            | GO:0005789     | endoplasmic reticulum membrane |
+            | UBERON:0002107 | liver                          |
+
+    Scenario: Expected drugs treat atrial fibrillation
+        Given a query graph with the following mappings
+            | source_curie | source_type        | edge_type     | target_curie | target_type |
+            |              | chemical_substance | indicated_for | DOID:0060224 | disease     |
+        When we send the question to RTX
+        Then the answer graph should contain the following nodes
+            | id                         | name        |
+            | CHEMBL.COMPOUND:CHEMBL1751 | digoxin     |
+            | CHEMBL.COMPOUND:CHEMBL27   | propranolol |
+            | CHEMBL.COMPOUND:CHEMBL1294 | quinidine   |

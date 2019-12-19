@@ -93,6 +93,43 @@ def step_impl(context,ident,stype):
     context.identifiers = ident.split(',')
     context.semantic_type = stype
 
+
+@given('a query graph with the following mappings')
+def step_impl(context):
+    """
+    This step builds a simple single-edge query graph (intended for RTX) based on the mappings specified in the .feature
+    file (in table format) and loads it into context.machine_question.
+    """
+    mappings = context.table[0]
+    context.machine_question = {
+        "message": {
+            "query_graph": {
+                "edges": [
+                    {
+                        "id": "qg2",
+                        "source_id": "qg0",
+                        "target_id": "qg1",
+                        "type": mappings['edge_type'] if mappings['edge_type'] else None
+                    }
+                ],
+                "nodes": [
+                    {
+                        "id": "qg0",
+                        "type": mappings['source_type'] if mappings['source_type'] else None,
+                        "curie": mappings['source_curie'] if mappings['source_curie'] else None
+                    },
+                    {
+                        "id": "qg1",
+                        "type": mappings['target_type'] if mappings['target_type'] else None,
+                        "curie": mappings['target_curie'] if mappings['target_curie'] else None
+                    }
+                ]
+            }
+        },
+        "max_results": 100
+    }
+
+
 """
 When
 """
@@ -195,7 +232,7 @@ def step_impl(context, url ):
 def step_impl(context):
     """
     This step sends a query (stored in context.machine_question) to RTX, makes sure that the server returns a 200
-    status code, and stores the response in context. If the question has been provided in human language format (in
+    status code, and stores the response in context. If the question has been provided in natural language format (in
     context.human_question), it first sends that to RTX for translation into a machine question.
     """
     rtx_api_url = "https://rtx.ncats.io/api/rtx/v1"
@@ -204,16 +241,14 @@ def step_impl(context):
     # First translate the natural language question, if there is one
     if hasattr(context, 'human_question'):
         translate_response = requests.post(rtx_api_url + "/translate", json=context.human_question, headers=rtx_headers)
-        context.content_type = translate_response.headers['content-type']
+        print(translate_response.status_code, translate_response.text)  # Only displays if test fails
         assert translate_response.status_code == 200
         context.machine_question = translate_response.json()
 
     # Then query RTX with the translated question
     query_response = requests.post(rtx_api_url + "/query", json=context.machine_question, headers=rtx_headers)
-    context.code = query_response.status_code
-    context.content_type = query_response.headers['content-type']
+    print(query_response.status_code, query_response.text)  # Only displays if test fails
     assert query_response.status_code == 200
-    context.response_text = query_response.text
     context.response_json = query_response.json()
 
 
@@ -257,9 +292,9 @@ def step_impl(context, value):
 @then('the answer graph should include node "{node}"')
 def step_impl(context, node):
     """
-    This step checks to see if a particular node is present in a reasoner's answer knowledge graph. The 'node' parameter
-    consists of a CURIE id, optionally followed by a node name in parentheses (e.g., 'UniProtKB:P00439 (PAH)'); anything
-    in parentheses is removed prior to processing.
+    This step checks to see if a particular node is present in a reasoner's answer graph. The 'node' parameter consists
+    of a CURIE id, optionally followed by a node name in parentheses (e.g., 'UniProtKB:P00439 (PAH)'); anything in
+    parentheses is ignored.
     """
     node_id = node.partition("(")[0].strip()  # Extract node ID from what was passed in
     nodes = context.response_json["knowledge_graph"]["nodes"]
@@ -272,7 +307,7 @@ def step_impl(context, node, min_expected_value):
     """
     This step checks to see if a particular node has been returned as a result from a reasoner with a similarity value
     value above a specified threshold. The 'node' parameter consists of a CURIE id, optionally followed by a node name
-    in parentheses (e.g., 'UniProtKB:P00439 (PAH)'); anything in parentheses is removed prior to processing.
+    in parentheses (e.g., 'UniProtKB:P00439 (PAH)'); anything in parentheses is ignored.
     """
     node_id = node.partition("(")[0].strip()  # Extract node ID from what was passed in
     results = context.response_json["results"]
@@ -286,11 +321,13 @@ def step_impl(context, node, min_expected_value):
 def step_impl(context):
     """
     This step checks to see if a list of ground truth nodes (provided in table format in the .feature file) are all
-    present in a reasoner's answer knowledge graph. The input table must have an 'id' column with CURIE ids.
+    present in a reasoner's answer graph. The input table must have an 'id' column with CURIE ids.
     """
     response_nodes = context.response_json["knowledge_graph"]["nodes"]
     for row in context.table:
         node_found = any(node['id'] == row['id'] for node in response_nodes)
+        if not node_found:
+            print(f"Response does not include node {row['id']} ({row['name']})!")
         assert node_found
 
 
@@ -298,7 +335,7 @@ def step_impl(context):
 def step_impl(context):
     """
     This step takes in a list of edges (provided in table format) and checks to see if they are present in a reasoner's
-    answer knowledge graph. The input table must have 'source_id' and 'target_id' columns with CURIE ids.
+    answer graph. The input table must have 'source_id' and 'target_id' columns with CURIE ids.
     """
     response_edges = context.response_json["knowledge_graph"]["edges"]
     for row in context.table:
