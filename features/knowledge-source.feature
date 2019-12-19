@@ -3,32 +3,32 @@ Feature: Check all knowledge sources
     Scenario: Check HMDB knowledge map
         Given a knowledge source at "https://translator.ncats.io/hmdb-knowledge-beacon"
         When we fire "/kmap" query
-        Then the response contains the following entries in "category" of "subject":
+        Then the response contains the following entries in "category" of "subject"
             | category    |
             | metabolite  |
-        And the response only contains the following entries in "category" of "subject":
+        And the response only contains the following entries in "category" of "subject"
             | category    |
             | metabolite  |
-        And the response contains the following entries in "relation" of "predicate":
+        And the response contains the following entries in "relation" of "predicate"
             | relation        |
             | interacts with  |
             | located in      |
             | participates in |
             | related to      |
-        And the response only contains the following entries in "relation" of "predicate":
+        And the response only contains the following entries in "relation" of "predicate"
             | relation        |
             | interacts with  |
             | located in      |
             | participates in |
             | related to      |
-        And the response contains the following entries in "category" of "object":
+        And the response contains the following entries in "category" of "object"
             | category                   |
             | protein                    |
             | cellular component         |
             | gross anatomical structure |
             | pathway                    |
             | disease                    |
-        And the response only contains the following entries in "category" of "object":
+        And the response only contains the following entries in "category" of "object"
             | category                   |
             | protein                    |
             | cellular component         |
@@ -40,7 +40,7 @@ Feature: Check all knowledge sources
     Scenario: Check HMDB categories
         Given a knowledge source at "https://translator.ncats.io/hmdb-knowledge-beacon"
         When we fire "/categories" query
-        Then the response contains the following entries in "category":
+        Then the response contains the following entries in "category"
             | category                   |
             | metabolite                 |
             | protein                    |
@@ -48,7 +48,7 @@ Feature: Check all knowledge sources
             | gross anatomical structure |
             | pathway                    |
             | disease                    |
-        And the response only contains the following entries in "category":
+        And the response only contains the following entries in "category"
             | category                   |
             | metabolite                 |
             | protein                    |
@@ -61,25 +61,25 @@ Feature: Check all knowledge sources
     Scenario: Check HMDB predicates
         Given a knowledge source at "https://translator.ncats.io/hmdb-knowledge-beacon"
         When we fire "/predicates" query
-        Then the response contains the following entries in "relation":
+        Then the response contains the following entries in "relation"
             | relation        |
             | interacts with  |
             | located in      |
             | participates in |
             | related to      |
-        And the response only contains the following entries in "relation":
+        And the response only contains the following entries in "relation"
             | relation        |
             | interacts with  |
             | located in      |
             | participates in |
             | related to      |
-        And the response contains the following entries in "edge_label":
+        And the response contains the following entries in "edge_label"
             | edge_label      |
             | interacts_with  |
             | located_in      |
             | participates_in |
             | related_to      |
-        And the response only contains the following entries in "edge_label":
+        And the response only contains the following entries in "edge_label"
             | edge_label      |
             | interacts_with  |
             | located_in      |
@@ -110,10 +110,10 @@ Feature: Check all knowledge sources
     Scenario: Check HMDB statements
         Given a knowledge source at "https://translator.ncats.io/hmdb-knowledge-beacon"
         When we fire "/statements?s=HMDB:HMDB0001879" query
-        Then the response only contains the following entries in "id" of "subject":
+        Then the response only contains the following entries in "id" of "subject"
             | id               |
             | HMDB:HMDB0001879 |
-        And the response only contains the following entries in "name" of "subject":
+        And the response only contains the following entries in "name" of "subject"
             | name    |
             | Aspirin |
 
