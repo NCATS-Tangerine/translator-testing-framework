@@ -203,7 +203,7 @@ Feature: Check RTX responses
             | id               | name |
             | UniProtKB:Q92838 | EDA  |
 
-    Scenario: Metabolite PGG2 physically interacts with Gene PTGS1
+    Scenario: Metabolite PGG2 physically interacts with Protein PTGS1
         Given a query graph with the following mappings
             | source_curie                  | source_type        | edge_type                 | target_curie | target_type |
             | UniProtKB:P23219 | protein | physically_interacts_with |              | metabolite     |
@@ -211,3 +211,10 @@ Feature: Check RTX responses
         Then the answer graph should contain the following nodes
             | id               | name |
             | KEGG:C05956 | Prostaglandin G2 |
+    
+    Scenario: ileum is associated with nitric oxide
+        Given the "English" question "What anatomy are associated with nitric oxide?"
+        When we send the question to RTX
+        Then the answer graph should contain the following nodes
+            | id               | name   |
+            | UniProtKB:P47989 | xanthine dehydrogenase  |
