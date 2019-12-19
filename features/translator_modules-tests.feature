@@ -71,6 +71,7 @@ Feature: Check Translator Module disease associated genes
             | identifier |
             | D000082    |
             | D006632    |
+            | D000079    |
             When we run the Translator "Chemical to Gene Interaction" Module
             Then the Translator Module result contains the following "gene" identifiers
                 | identifier      |
@@ -80,6 +81,8 @@ Feature: Check Translator Module disease associated genes
                 | NCBIGene:25     |
                 | NCBIGene:154    |
                 | NCBIGene:241    |
+                | NCBIGene:836    |
+                | NCBIGene:596    |
 
    Scenario: Check Translator Module gene_to_chemical_interaction
         Given the following Translator Modules input "gene" identifiers
