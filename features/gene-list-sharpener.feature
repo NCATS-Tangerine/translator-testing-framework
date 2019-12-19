@@ -1,8 +1,7 @@
 Feature: Check gene-list sharpener
 
     Background: Specify gene-list sharpener API
-        Given a gene-list sharpener at "http://chembio-dev-01:9010/api"
-
+        Given a gene-list sharpener at "https://sharpener.ncats.io/api"
 
     Scenario: Check gene-list transformers
         Given the gene-list sharpener
@@ -100,6 +99,16 @@ Feature: Check gene-list sharpener
         and the length of the gene list should be 17
 
 
+    Scenario: Check MSigDB hypergeometric enrichment filter
+        Given the gene-list sharpener
+        and a gene list "ADA,EPB41L1,GPX4"
+        when we call "MSigDB hypergeometric enrichment filter" transformer with the following parameters:
+            | max p-value | max q-value |
+            |      0.0009 |    0.05 |
+        then the response should have some JSONPath "source" with "string" "MSigDB hypergeometric enrichment filter"
+        and the length of the gene list should be 2
+
+
     Scenario: Check OMIM common-to-rare disease genes producer
         Given the gene-list sharpener
         and a gene list "ADA,EPB41L1,GPX4"
@@ -109,4 +118,32 @@ Feature: Check gene-list sharpener
         then the response should have some JSONPath "source" with "string" "OMIM common-to-rare disease genes"
         and the length of the gene list should be 2648
 
+
+    Scenario: Check disease genes producer
+        Given the gene-list sharpener
+        when we call "Disease Association from MONDO ID" transformer with the following parameters:
+            | Disease ID    |
+            | MONDO:0005015 |
+        then the response should have some JSONPath "source" with "string" "Disease Association from MONDO ID"
+        and the length of the gene list should be 98
+
+
+    Scenario: Check phenotype similarity expander
+        Given the gene-list sharpener
+        and a gene list "ADA,EPB41L1,GPX4"
+        when we call "HPO phenotype similarity" transformer with the following parameters:
+            | similarity threshold |
+            |                  0.5 |
+        then the response should have some JSONPath "source" with "string" "HPO phenotype similarity"
+        and the length of the gene list should be 36
+
+
+    Scenario: Check STRING expander
+        Given the gene-list sharpener
+        and a gene list "ADA,EPB41L1,GPX4"
+        when we call "STRING protein-protein interaction" transformer with the following parameters:
+            | minimum combined score | minimum neighborhood score | minimum gene fusion score | minimum cooccurence score| minimum coexpression score | minimum experimental score | minimum database score | minimum textmining score | minimum best non-textmining component score | maximum number of genes |
+            |                   0.95 |                          0 |                         0 |                        0 |                          0 |                          0 |                      0 |                        0 |                                           0 |                       10|
+        then the response should have some JSONPath "source" with "string" "STRING protein-protein interaction"
+        and the length of the gene list should be 16
 
