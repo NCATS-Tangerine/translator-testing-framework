@@ -121,11 +121,11 @@ Feature: Check gene-list sharpener
 
     Scenario: Check disease genes producer
         Given the gene-list sharpener
-        when we call "Disease Association from MONDO ID" transformer with the following parameters:
-            | Disease ID    |
-            | MONDO:0005015 |
-        then the response should have some JSONPath "source" with "string" "Disease Association from MONDO ID"
-        and the length of the gene list should be 98
+        when we call "MONDO disease association" transformer with the following parameters:
+            | MONDO disease ID |
+            | MONDO:0005015    |
+        then the response should have some JSONPath "source" with "string" "MONDO disease association"
+        and the length of the gene list should be 747
 
 
     Scenario: Check phenotype similarity expander
@@ -146,4 +146,25 @@ Feature: Check gene-list sharpener
             |                   0.95 |                          0 |                         0 |                        0 |                          0 |                          0 |                      0 |                        0 |                                           0 |                       10|
         then the response should have some JSONPath "source" with "string" "STRING protein-protein interaction"
         and the length of the gene list should be 16
+
+
+    Scenario: Check gene-interaction expander
+        Given the gene-list sharpener
+        and a gene list "ADA,EPB41L1,GPX4"
+        when we call "BioLink gene-gene interaction" transformer with the following parameters:
+            | interaction threshold |
+            |                     1 |
+        then the response should have some JSONPath "source" with "string" "BioLink gene-gene interaction"
+        and the length of the gene list should be 5
+
+
+    Scenario: Check pathDIP pathway-enrichment expander
+        Given the gene-list sharpener
+        and a gene list "ADA,EPB41L1,GPX4"
+        when we call "pathDIP pathway-enrichment analysis" transformer with the following parameters:
+            | maximum number of genes | pathway p-value | gene p-value |
+            |                      10 |               1 |         1e-5 |
+        then the response should have some JSONPath "source" with "string" "pathDIP pathway-enrichment analysis"
+        and the length of the gene list should be 13
+
 
