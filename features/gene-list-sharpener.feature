@@ -168,3 +168,37 @@ Feature: Check gene-list sharpener
         and the length of the gene list should be 13
 
 
+    Scenario: Check union
+        Given the gene-list sharpener
+        and a gene list "ADA,EPB41L1,GPX4"
+        and another gene list "ADA,TP53,GPX4"
+        when we call gene-list aggregator "union"
+        then the response should have some JSONPath "source" with "string" "Gene-list union"
+        and the length of the gene list should be 4
+
+
+    Scenario: Check intersection
+        Given the gene-list sharpener
+        and a gene list "ADA,EPB41L1,GPX4"
+        and another gene list "ADA,TP53,GPX4"
+        when we call gene-list aggregator "intersection"
+        then the response should have some JSONPath "source" with "string" "Gene-list intersection"
+        and the length of the gene list should be 2
+
+
+    Scenario: Check difference
+        Given the gene-list sharpener
+        and a gene list "ADA,EPB41L1,GPX4"
+        and another gene list "ADA,TP53,GPX4"
+        when we call gene-list aggregator "difference"
+        then the response should have some JSONPath "source" with "string" "Gene-list difference"
+        and the length of the gene list should be 1
+
+
+    Scenario: Check symmetric difference
+        Given the gene-list sharpener
+        and a gene list "ADA,EPB41L1,GPX4"
+        and another gene list "ADA,TP53,GPX4"
+        when we call gene-list aggregator "symmetric difference"
+        then the response should have some JSONPath "source" with "string" "Gene-list symmetric difference"
+        and the length of the gene list should be 2

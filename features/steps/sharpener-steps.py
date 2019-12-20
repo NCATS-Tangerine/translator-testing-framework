@@ -39,6 +39,22 @@ def step_impl(context, gene_list_str):
         assert(len(response_json['genes']) == len(gene_list))
 
 
+@given('another gene list "{gene_list_str}"')
+def step_impl(context, gene_list_str):
+    """
+        Given an input-gene-list
+    """
+    url = context.base_url+"/create_gene_list"
+    print(url)
+    gene_list = gene_list_str.split(',')
+    print(gene_list)
+    with closing(requests.post(url, json=gene_list, stream=False)) as response:
+        response_json = response.json()
+        context.gene_list_id_1 = context.gene_list_id
+        context.gene_list_id_2 = response_json['gene_list_id']
+        assert(len(response_json['genes']) == len(gene_list))
+
+
 @when('we request the gene list')
 def step_impl(context):
     url = context.base_url+'/gene_list/'+context.gene_list_id
@@ -60,6 +76,21 @@ def step_impl(context, transformer):
     for name in context.table.headings:
         controls.append({"name":name,"value":values[name]})
     data = {"name":transformer,"gene_list_id":context.gene_list_id, "controls":controls}
+    print(data)
+    with closing(requests.post(url, json=data, stream=False)) as response:
+        context.response = response
+        context.response_json = response.json()
+        print(context.response_json)
+
+
+@when('we call gene-list aggregator "{aggregator}"')
+def step_impl(context, aggregator):
+    """
+    This step launches an aggregator
+    """
+    url = context.base_url+'/aggregate'
+    print(url)
+    data = {"operation":aggregator,"gene_list_ids":[context.gene_list_id_1,context.gene_list_id_2]}
     print(data)
     with closing(requests.post(url, json=data, stream=False)) as response:
         context.response = response
