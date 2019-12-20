@@ -1,4 +1,5 @@
 from behave import given, when, then
+import json
 import requests
 from contextlib import closing
 
@@ -22,6 +23,18 @@ def step_impl(context, query):
     url = context.base_url+query
     print('url:',url,'\n')
     with closing(requests.get(url)) as response:
+        context.response = response
+        context.response_json = response.json()
+
+
+@when('we fire "{query}" query with the following body')
+def step_impl(context, query):
+    """
+    Fire a knowledge-source query
+    """
+    url = context.base_url+query
+    print('url:',url,'\n')
+    with closing(requests.post(url, json=json.loads(context.text))) as response:
         context.response = response
         context.response_json = response.json()
 
@@ -104,10 +117,19 @@ def step_impl(context, key):
         print(' ', entry[key])
         assert entry[key] in entries
 
+
 @then('the size of the response is {size}')
 def step_impl(context, size):
     """
     This step checks the size of the response
     """
     assert len(context.response_json) == int(size)
+
+
+@then('the size of entry "{key}" is {size}')
+def step_impl(context, key, size):
+    """
+    This step checks the size of the response
+    """
+    assert len(context.response_json[key]) == int(size)
 
