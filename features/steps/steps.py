@@ -246,6 +246,7 @@ def step_impl(context):
         context.machine_question = translate_response.json()
 
     # Then query RTX with the translated question
+    context.machine_question["bypass_cache"] = "true"
     query_response = requests.post(rtx_api_url + "/query", json=context.machine_question, headers=rtx_headers)
     print(query_response.status_code, query_response.text)  # Only displays if test fails
     assert query_response.status_code == 200
