@@ -1,6 +1,9 @@
 Feature: Check RTX responses
+    This feature asks the RTX knowledge graph various questions and verifies that its answers include expected
+    results. The tests query RTX using natural language questions, query graphs, or predefined query types.
 
-    # NOTE: For tables, the 'name' column is always optional (it is simply there for readability)
+    # NOTE: For tables, the 'name' column is always optional (it is ignored in the step implementations; it is simply
+    # there for readability in this file)
 
     Scenario: Fanconi anemia is associated with expected genes
         Given the "English" question "What genes are associated with Fanconi anemia?"
