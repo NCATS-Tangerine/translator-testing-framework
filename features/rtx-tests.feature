@@ -207,10 +207,11 @@ Feature: Check RTX responses
         When we send the question to RTX
         Then the answer graph should include node "KEGG:C05956 (Prostaglandin G2)"
     
-    Scenario: ileum is associated with nitric oxide
+    Scenario: Ileum is associated with nitric oxide
         Given the "English" question "What anatomy are associated with nitric oxide?"
         When we send the question to RTX
         Then the answer graph should include node "UniProtKB:P47989 (xanthine dehydrogenase)"
+        And the answer graph should include node "UBERON:0002116 (ileum)"
     
     Scenario: AKT serine/threonine kinase 1 participates in Phenylketonuria pathway
         Given the machine question
