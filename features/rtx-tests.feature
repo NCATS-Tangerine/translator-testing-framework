@@ -1,6 +1,6 @@
 Feature: Check RTX responses
-    This feature asks the RTX knowledge graph various questions and verifies that its answers include expected
-    results. The tests query RTX using natural language questions, query graphs, or predefined query types.
+    # This feature asks the RTX knowledge graph various questions and verifies that its answers include expected
+    # results. The tests query RTX using natural language questions, query graphs, or predefined query types.
 
     # NOTE: For tables, the 'name' column is always optional (it is ignored in the step implementations; it is simply
     # there for readability in this file)
@@ -210,8 +210,10 @@ Feature: Check RTX responses
     Scenario: Ileum is associated with nitric oxide
         Given the "English" question "What anatomy are associated with nitric oxide?"
         When we send the question to RTX
-        Then the answer graph should include node "UniProtKB:P47989 (xanthine dehydrogenase)"
-        And the answer graph should include node "UBERON:0002116 (ileum)"
+        Then the answer graph should contain the following nodes
+            | id               | name                   |
+            | UniProtKB:P47989 | xanthine dehydrogenase |
+            | UBERON:0002116   | ileum                  |
     
     Scenario: AKT serine/threonine kinase 1 participates in Phenylketonuria pathway
         Given the machine question
