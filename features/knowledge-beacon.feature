@@ -3,7 +3,7 @@ Feature: Check Knowledge Beacons
     Scenario: Check Rhea Beacon categories
         Given a knowledge source at "https://kba.ncats.io/beacon/rhea"
         When we fire "/categories" query
-        Then the response contains the following entries in "category"
+        Then the response entries contain the following entries in the field "category"
             | category                   |
             | chemical substance         |
             | protein                    |
@@ -17,7 +17,7 @@ Feature: Check Knowledge Beacons
     Scenario: Check Rhea Beacon predicates
         Given a knowledge source at "https://kba.ncats.io/beacon/rhea"
         When we fire "/predicates" query
-        Then the response contains the following entries in "relation"
+        Then the response entries contain the following entries in the field "relation"
             | relation                                                     |
             | participates in the same reaction side as                    |
             | participates in the opposite reaction side as                |
@@ -37,7 +37,7 @@ Feature: Check Knowledge Beacons
             | increases_activity_of                                        |
             | catalyzes same reaction as                                   |
             | has same catalyst                                            |
-        And the response contains the following entries in "edge_label"
+        And the response entries contain the following entries in the field "edge_label"
             | edge_label                 |
             | molecularly_interacts_with |
             | derives_into               |
@@ -59,7 +59,7 @@ Feature: Check Knowledge Beacons
     Scenario: Check Rhea Beacon Name Space
         Given a knowledge source at "https://kba.ncats.io/beacon/rhea"
         When we fire "/namespaces" query
-        Then the response contains the following entries in "local_prefix"
+        Then the response entries contain the following entries in the field "local_prefix"
             | local_prefix |
             | RHEA         |
         And the response only contains the following entries in "local_prefix"
@@ -129,10 +129,10 @@ Feature: Check Knowledge Beacons
             | protein                    |
             | molecular activity         |
 
-    Scenario: Check Rhea Beacon concepts
+    Scenario: Check keyword query of Rhea Beacon concepts
         Given a knowledge source at "https://kba.ncats.io/beacon/rhea"
         When we fire "/concepts?keywords=aspirin&categories=protein" query
-        Then the response contains "Acetylsalicylate deacetylase." in "name"
+        Then some entry in the response contains "Acetylsalicylate deacetylase." in field "name"
 
     # Rhea doesn't really support exactmatches?
     #Scenario: Check Rhea Beacon exactmatches
@@ -141,12 +141,12 @@ Feature: Check Knowledge Beacons
     #    Then the size of the response is 1
     #    And the response should have some JSONPath "$[0].has_exact_matches[0]" with "string" ""
 
-    Scenario: Check Rhea Beacon concept
+    Scenario: Check one particular Rhea Beacon concept
         Given a knowledge source at "https://kba.ncats.io/beacon/rhea"
         When we fire "/concepts/EC%3A3.1.1.55" query
-        Then the response should have some JSONPath "id" with "string" "EC:3.1.1.55"
-        Then the response should have some JSONPath "name" with "string" "Acetylsalicylate deacetylase."
-        Then the response should have some JSONPath "uri" with "string" "https://enzyme.expasy.org/EC/3.1.1.55"
+        Then the response should have a field "id" with "string" "EC:3.1.1.55"
+        Then the response should have a field "name" with "string" "Acetylsalicylate deacetylase."
+        Then the response should have a field "uri" with "string" "https://enzyme.expasy.org/EC/3.1.1.55"
 
     Scenario: Check Rhea Beacon statements
         Given a knowledge source at "https://kba.ncats.io/beacon/rhea"
@@ -174,7 +174,7 @@ Feature: Check Knowledge Beacons
     Scenario: Check SMPDB Beacon categories
         Given a knowledge source at "https://kba.ncats.io/beacon/smpdb"
         When we fire "/categories" query
-        Then the response contains the following entries in "category"
+        Then the response entries contain the following entries in the field "category"
             | category           |
             | chemical substance |
             | metabolite         |
@@ -190,7 +190,7 @@ Feature: Check Knowledge Beacons
     Scenario: Check SMPDB Beacon predicates
         Given a knowledge source at "https://kba.ncats.io/beacon/smpdb"
         When we fire "/predicates" query
-        Then the response contains the following entries in "relation"
+        Then the response entries contain the following entries in the field "relation"
             | relation                        |
             | chemical_affects                |
             | controls_transport_of           |
@@ -222,7 +222,7 @@ Feature: Check Knowledge Beacons
             | controls_state_change_of        |
             | neighbor_of                     |
             | reacts_with                     |
-        And the response contains the following entries in "edge_label"
+        And the response entries contain the following entries in the field "edge_label"
             | edge_label                      |
             | affects                         |
             | affects_transport_of            |
@@ -248,7 +248,7 @@ Feature: Check Knowledge Beacons
     Scenario: Check SMPDB Beacon Name Space
         Given a knowledge source at "https://kba.ncats.io/beacon/smpdb"
         When we fire "/namespaces" query
-        Then the response contains the following entries in "local_prefix"
+        Then the response entries contain the following entries in the field "local_prefix"
             | local_prefix |
             | CHEBI        |
             | HMDB         |
@@ -338,11 +338,11 @@ Feature: Check Knowledge Beacons
             | pathway            |
             | protein            |
 
-    Scenario: Check SMPDB Beacon concepts
+    Scenario: Check keyword query of SMPDB Beacon concepts
         Given a knowledge source at "https://kba.ncats.io/beacon/smpdb"
         When we fire "/concepts?keywords=acetaldehyde" query
-        Then the response contains "metabolite" in "categories"
-        And the response contains the following entries in "id"
+        Then some entry in the response contains "metabolite" in field "categories"
+        And some entry in the response contains one of the following values in field "id"
             | id          |
             | CHEBI:27978 |
             | CHEBI:15343 |
@@ -351,7 +351,7 @@ Feature: Check Knowledge Beacons
             | CHEBI:50157 |
             | CHEBI:18086 |
             | CHEBI:27871 |
-        And the response contains the following entries in "name"
+        And some entry in the response contains one of the following values in field "name"
             | name                            |
             | 3,4-Dihydroxyphenylacetaldehyde |
             | Acetaldehyde                    |
@@ -368,12 +368,12 @@ Feature: Check Knowledge Beacons
     #    Then the size of the response is 1
     #    And the response should have some JSONPath "$[0].has_exact_matches[0]" with "string" ""
 
-    Scenario: Check SMPDB Beacon concept
+    Scenario: Check one particular SMPDB Beacon concept
         Given a knowledge source at "https://kba.ncats.io/beacon/smpdb"
         When we fire "/concepts/CHEBI%3A18086" query
-        Then the response should have some JSONPath "id" with "string" "CHEBI:18086"
-        Then the response should have some JSONPath "name" with "string" "Indoleacetaldehyde"
-        Then the response should have some JSONPath "uri" with "string" "https://www.ebi.ac.uk/chebi/searchId.do?chebiId=CHEBI:18086"
+        Then the response should have a field "id" with "string" "CHEBI:18086"
+        Then the response should have a field "name" with "string" "Indoleacetaldehyde"
+        Then the response should have a field "uri" with "string" "https://www.ebi.ac.uk/chebi/searchId.do?chebiId=CHEBI:18086"
 
     Scenario: Check SMPDB Beacon statements
         Given a knowledge source at "https://kba.ncats.io/beacon/smpdb"
@@ -414,3 +414,320 @@ Feature: Check Knowledge Beacons
             | 2-Amino-3-carboxymuconic acid semialdehyde |
             | 2-amino-3-carboxymuconate-6-semialdehyde decarboxylase |
             | Tryptophan Metabolism |
+
+
+    Scenario: Check SemMedDb Beacon Categories
+        Given a knowledge source at "https://kba.ncats.io/beacon/semmeddb"
+        When we fire "/categories" query
+        Then the response entries contain the following entries in the field "category"
+            | category                       |
+            | chemical substance             |
+            | disease or phenotypic feature  |
+            | gene                           |
+            | biological entity              |
+            | protein                        |
+            | gross anatomical structure     |
+            | biological process or activity |
+            | anatomical entity              |
+            | named thing                    |
+            | cell                           |
+            | activity and behavior          |
+            | phenotypic feature             |
+            | genomic entity                 |
+        And the response only contains the following entries in "category"
+            | category                       |
+            | chemical substance             |
+            | disease or phenotypic feature  |
+            | gene                           |
+            | biological entity              |
+            | protein                        |
+            | gross anatomical structure     |
+            | biological process or activity |
+            | anatomical entity              |
+            | named thing                    |
+            | cell                           |
+            | activity and behavior          |
+            | phenotypic feature             |
+            | genomic entity                 |
+
+    Scenario: Check SemMedDb Beacon Predicates
+        Given a knowledge source at "https://kba.ncats.io/beacon/semmeddb"
+        When we fire "/predicates" query
+        Then the response entries contain the following entries in the field "relation"
+            | relation |
+            | semmeddb:affects |
+            | semmeddb:interacts_with |
+            | semmeddb:location_of |
+            | semmeddb:coexists_with |
+            | semmeddb:part_of |
+            | semmeddb:positively_regulates |
+            | semmeddb:negatively_regulates |
+            | semmeddb:causes |
+            | semmeddb:treats |
+            | semmeddb:produces |
+            | semmeddb:related_to |
+            | semmeddb:gene_associated_with_condition |
+            | semmeddb:subclass_of |
+            | semmeddb:predisposes |
+            | semmeddb:prevents |
+            | semmeddb:derives_into |
+            | semmeddb:manifestation_of |
+            | semmeddb:precedes |
+        And the response only contains the following entries in "relation"
+            | relation |
+            | semmeddb:affects |
+            | semmeddb:interacts_with |
+            | semmeddb:location_of |
+            | semmeddb:coexists_with |
+            | semmeddb:part_of |
+            | semmeddb:positively_regulates |
+            | semmeddb:negatively_regulates |
+            | semmeddb:causes |
+            | semmeddb:treats |
+            | semmeddb:produces |
+            | semmeddb:related_to |
+            | semmeddb:gene_associated_with_condition |
+            | semmeddb:subclass_of |
+            | semmeddb:predisposes |
+            | semmeddb:prevents |
+            | semmeddb:derives_into |
+            | semmeddb:manifestation_of |
+            | semmeddb:precedes |
+        And the response entries contain the following entries in the field "edge_label"
+            | edge_label |
+            | affects |
+            | interacts_with |
+            | location_of |
+            | coexists_with |
+            | part_of |
+            | positively_regulates |
+            | negatively_regulates |
+            | causes |
+            | treats |
+            | produces |
+            | related_to |
+            | gene_associated_with_condition |
+            | subclass_of |
+            | predisposes |
+            | prevents |
+            | derives_into |
+            | manifestation_of |
+            | precedes |
+        And the response only contains the following entries in "edge_label"
+            | edge_label |
+            | affects |
+            | interacts_with |
+            | location_of |
+            | coexists_with |
+            | part_of |
+            | positively_regulates |
+            | negatively_regulates |
+            | causes |
+            | treats |
+            | produces |
+            | related_to |
+            | gene_associated_with_condition |
+            | subclass_of |
+            | predisposes |
+            | prevents |
+            | derives_into |
+            | manifestation_of |
+            | precedes |
+
+    Scenario: Check SemMedDb Beacon Name Space
+        Given a knowledge source at "https://kba.ncats.io/beacon/semmeddb"
+        When we fire "/namespaces" query
+        Then the response entries contain the following entries in the field "local_prefix"
+            | local_prefix |
+            | UMLS        |
+        And the response only contains the following entries in "local_prefix"
+            | local_prefix |
+            | UMLS         |
+
+    Scenario: Check SemMedDb Beacon Knowledge Map
+        Given a knowledge source at "https://kba.ncats.io/beacon/semmeddb"
+        When we fire "/kmap" query
+        Then the response contains the following entries in "category" of "subject"
+            | category                       |
+            | chemical substance             |
+            | disease or phenotypic feature  |
+            | gene                           |
+            | biological entity              |
+            | protein                        |
+            | gross anatomical structure     |
+            | biological process or activity |
+            | anatomical entity              |
+            | cell                           |
+            | cell component                 |
+            | activity and behavior          |
+            | phenotypic feature             |
+            | genomic entity                 |
+        And the response only contains the following entries in "category" of "subject"
+            | category                       |
+            | chemical substance             |
+            | disease or phenotypic feature  |
+            | gene                           |
+            | biological entity              |
+            | protein                        |
+            | gross anatomical structure     |
+            | biological process or activity |
+            | anatomical entity              |
+            | cell                           |
+            | cell component                 |
+            | activity and behavior          |
+            | phenotypic feature             |
+            | genomic entity                 |
+        And the response contains the following entries in "edge_label" of "predicate"
+            | edge_label                     |
+            | affects                        |
+            | interacts_with                 |
+            | location_of                    |
+            | coexists_with                  |
+            | part_of                        |
+            | positively_regulates           |
+            | negatively_regulates           |
+            | causes                         |
+            | treats                         |
+            | produces                       |
+            | related_to                     |
+            | gene_associated_with_condition |
+            | subclass_of                    |
+            | predisposes                    |
+            | prevents                       |
+            | derives_into                   |
+            | manifestation_of               |
+            | precedes                       |
+        And the response only contains the following entries in "edge_label" of "predicate"
+            | edge_label                     |
+            | affects                        |
+            | interacts_with                 |
+            | location_of                    |
+            | coexists_with                  |
+            | part_of                        |
+            | positively_regulates           |
+            | negatively_regulates           |
+            | causes                         |
+            | treats                         |
+            | produces                       |
+            | related_to                     |
+            | gene_associated_with_condition |
+            | subclass_of                    |
+            | predisposes                    |
+            | prevents                       |
+            | derives_into                   |
+            | manifestation_of               |
+            | precedes                       |
+        And the response contains the following entries in "category" of "object"
+            | category                       |
+            | chemical substance             |
+            | disease or phenotypic feature  |
+            | gene                           |
+            | biological entity              |
+            | protein                        |
+            | gross anatomical structure     |
+            | biological process or activity |
+            | anatomical entity              |
+            | cell                           |
+            | cell component                 |
+            | activity and behavior          |
+            | phenotypic feature             |
+            | genomic entity                 |
+        And the response only contains the following entries in "category" of "object"
+            | category                       |
+            | chemical substance             |
+            | disease or phenotypic feature  |
+            | gene                           |
+            | biological entity              |
+            | protein                        |
+            | gross anatomical structure     |
+            | biological process or activity |
+            | anatomical entity              |
+            | cell                           |
+            | cell component                 |
+            | activity and behavior          |
+            | phenotypic feature             |
+            | genomic entity                 |
+
+    Scenario: Check keyword query of SemMedDb Beacon Concepts
+        Given a knowledge source at "https://kba.ncats.io/beacon/semmeddb"
+        When we fire "/concepts?keywords=FANCA" query
+        Then some entry in the response contains "gene" in field "categories"
+        And some entry in the response contains one of the following values in field "id"
+            | id            |
+            | UMLS:C0531299 |
+            | UMLS:C1414527 |
+            | UMLS:C2828026 |
+        And some entry in the response contains one of the following values in field "name"
+            | name                 |
+            | FANCA protein, human |
+            | FANCA gene           |
+            | FANCA wt Allele      |
+
+    Scenario: Check one particular SemMedDb Beacon Concept
+        Given a knowledge source at "https://kba.ncats.io/beacon/semmeddb"
+        When we fire "/concepts/UMLS%3AC1414527" query
+        Then the response should have a field "id" with "string" "UMLS:C1414527"
+        And the response should have a field "name" with "string" "FANCA gene"
+        And the response contains the following entries in the field "exact_matches"
+            | exact_matches           |
+            | HGNC:HGNC:3582          |
+            | OMIM:607139             |
+            | NCI_NCI-HGNC:HGNC:3582  |
+            | NCI:C85995              |
+            | MTH:NOCODE              |
+
+    Scenario: Check SemMedDb Beacon Exactmatches
+        Given a knowledge source at "https://kba.ncats.io/beacon/semmeddb"
+        When we fire "/exactmatches?c=UMLS%3AC1414527" query
+        Then the response should have some entry with field "id" with "string" "UMLS:C1414527"
+        And the response should have some entry with field "within_domain" with "boolean" "True"
+        And the response entries contain the following entries in the field "has_exact_matches"
+            | has_exact_matches      |
+            | HGNC:HGNC:3582         |
+            | OMIM:607139            |
+            | NCI_NCI-HGNC:HGNC:3582 |
+            | NCI:C85995             |
+            | MTH:NOCODE             |
+            | UMLS:C1414527          |
+
+
+    Scenario: Check SemMedDb Beacon Statements
+        Given a knowledge source at "https://kba.ncats.io/beacon/semmeddb"
+        When we fire "/statements?s=UMLS%3AC1414527" query
+        Then the response only contains the following entries in "id" of "subject"
+            | id            |
+            | UMLS:C1414527 |
+        And the response only contains the following entries in "name" of "subject"
+            | name       |
+            | FANCA gene |
+        And the response only contains the following entries in "categories" of "subject"
+            | categories |
+            | gene       |
+        And the response only contains the following entries in "edge_label" of "predicate"
+            | edge_label                     |
+            | treats                         |
+            | part_of                        |
+            | coexists_with                  |
+            | causes                         |
+            | gene_associated_with_condition |
+            | affects                        |
+        And the response only contains the following entries in "id" of "object"
+            | id |
+            | UMLS:C0006142 |
+            | UMLS:C0023467 |
+            | UMLS:C0162326 |
+            | UMLS:C0015625 |
+            | UMLS:C0235974 |
+            | UMLS:C0687133 |
+        And the response only contains the following entries in "name" of "object"
+            | name                         |
+            | Malignant neoplasm of breast |
+            | Leukemia, Myelocytic, Acute  |
+            | DNA Sequence                 |
+            | Fanconi Anemia               |
+            | Pancreatic carcinoma         |
+            | Drug Interactions            |
+        And the response only contains the following entries in "categories" of "object"
+            | categories                    |
+            | disease or phenotypic feature |
+            | genomic entity                |

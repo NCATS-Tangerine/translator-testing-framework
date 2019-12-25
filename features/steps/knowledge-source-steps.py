@@ -45,28 +45,35 @@ def step_impl(context, key, parent):
         assert row[key] in entries
 
 
-def _get_collected_entries(context, key):
+def _get_collected_entries(field_value):
     collected_entries = set()
-    print('Collected entries:')
-    for entry in context.response_json:
-        field_value = entry[key]
-        # Some fields may be a list of values
-        if isinstance(field_value, list):
-            for item in field_value:
-                print(' ', item)
-                collected_entries.add(item)
-        else:  # assume a simple scalar
-            print(' ', field_value)
-            collected_entries.add(field_value)
+    # Some fields may be a list of values
+    if isinstance(field_value, list):
+        for item in field_value:
+            print(' ', item)
+            collected_entries.add(item)
+    else:  # assume a simple scalar
+        print(' ', field_value)
+        collected_entries.add(field_value)
     return collected_entries
 
 
-@then('the response contains the following entries in "{key}"')
+def _aggregate_collected_entries(context, key):
+    collected_entries = set()
+    for entry in context.response_json:
+        field_value = entry[key]
+        [collected_entries.add(e) for e in _get_collected_entries(field_value)]
+    return collected_entries
+
+
+@then('the response contains the following entries in the field "{key}"')
 def step_impl(context, key):
     """
-    This step checks whether all values specified in the test are contained in the response
+    This step checks whether all values specified in the test are contained within the field of the response
     """
-    collected_entries = _get_collected_entries(context, key)
+    print('Collected entries:')
+    field_value = context.response_json[key]
+    collected_entries = _get_collected_entries(field_value)
 
     print('Tested entries:')
     for row in context.table:
@@ -75,16 +82,47 @@ def step_impl(context, key):
         assert value in collected_entries
 
 
-@then('the response contains "{value}" in "{key}"')
+@then('some entry in the response contains "{value}" in field "{key}"')
 def step_impl(context, value, key):
     """
     This step checks whether all values specified in the test are contained in the response
     """
-    collected_entries = _get_collected_entries(context, key)
+    print('Collected entries:')
+    collected_entries = _aggregate_collected_entries(context, key)
 
     print('Tested entry:')
     print(' ', value)
     assert value in collected_entries
+
+
+@then('some entry in the response contains one of the following values in field "{key}"')
+def step_impl(context, key):
+    """
+    This step checks whether all values specified in the test are contained in the response
+    """
+    print('Collected entries:')
+    collected_entries = _aggregate_collected_entries(context, key)
+
+    print('Tested entries:')
+    for row in context.table:
+        value = row[key]
+        print(' ', value)
+        assert value in collected_entries
+
+
+@then('the response entries contain the following entries in the field "{key}"')
+def step_impl(context, key):
+    """
+    This step checks whether all values specified in the test are contained within the field of the response
+    """
+    print('Collected entries:')
+    collected_entries = _aggregate_collected_entries(context, key)
+
+    print('Tested entries:')
+    for row in context.table:
+        value = row[key]
+        print(' ', value)
+        assert value in collected_entries
 
 
 @then('the response only contains the following entries in "{key}" of "{parent}"')
@@ -114,6 +152,7 @@ def step_impl(context, key, parent):
                 tested_entries.add(item)
         else:  # assume a simple scalar
             tested_entries.add(field_value)
+
     for item in tested_entries:
         print(' ', item)
         assert item in collected_entries
@@ -141,6 +180,36 @@ def step_impl(context, size):
     This step checks the size of the response
     """
     assert len(context.response_json) == int(size)
+
+
+@then('the response should have a field "{field}" with "{data_type}" "{value}"')
+def step_impl(context, field, data_type, value):
+    """
+    The response should have a result with a field containing a defined value of a specified data type.
+    """
+    result = context.response_json
+    field_expr = jsonpath_rw.parse(field)
+    fields = field_expr.find(result)
+    assert len(fields) != 0
+    if data_type == "string":
+        value = str(value)
+    elif data_type == "integer":
+        value = int(value)
+    elif data_type == "float":
+        value = float(value)
+    elif data_type == "boolean":
+        value = eval(value)
+    else:
+        logging.error("Unhandled data_type: {}".format(data_type))
+        assert False
+
+    is_found = False
+    for f in fields:
+        if f.value == value:
+            is_found = True
+            break
+
+    assert is_found is True
 
 
 @then('the response should have some entry with field "{field}" with "{data_type}" "{value}"')
