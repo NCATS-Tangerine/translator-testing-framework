@@ -70,8 +70,9 @@ def step_impl(context, key):
 
     print('Tested entries:')
     for row in context.table:
-        print(' ', row[key])
-        assert row[key] in collected_entries
+        value = row[key]
+        print(' ', value)
+        assert value in collected_entries
 
 
 @then('the response contains "{value}" in "{key}"')
