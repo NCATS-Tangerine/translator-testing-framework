@@ -45,31 +45,7 @@ def step_impl(context, key, parent):
         assert row[key] in entries
 
 
-def get_collected_entries(context,key):
-    pass
-
-
-@then('the response contains the following entries in "{key}"')
-def step_impl(context, key):
-    """
-    This step checks whether all values specified in the test are contained in the response
-    """
-    entries = set()
-    print('Collected entries:')
-    for entry in context.response_json:
-        print(' ', entry[key])
-        entries.add(entry[key])
-    print('Tested entries:')
-    for row in context.table:
-        print(' ', row[key])
-        assert row[key] in entries
-
-
-@then('the response contains "{value}" in "{key}"')
-def step_impl(context, value, key):
-    """
-    This step checks whether all values specified in the test are contained in the response
-    """
+def _get_collected_entries(context, key):
     collected_entries = set()
     print('Collected entries:')
     for entry in context.response_json:
@@ -82,6 +58,28 @@ def step_impl(context, value, key):
         else:  # assume a simple scalar
             print(' ', field_value)
             collected_entries.add(field_value)
+    return collected_entries
+
+
+@then('the response contains the following entries in "{key}"')
+def step_impl(context, key):
+    """
+    This step checks whether all values specified in the test are contained in the response
+    """
+    collected_entries = _get_collected_entries(context, key)
+
+    print('Tested entries:')
+    for row in context.table:
+        print(' ', row[key])
+        assert row[key] in collected_entries
+
+
+@then('the response contains "{value}" in "{key}"')
+def step_impl(context, value, key):
+    """
+    This step checks whether all values specified in the test are contained in the response
+    """
+    collected_entries = _get_collected_entries(context, key)
 
     print('Tested entry:')
     print(' ', value)
