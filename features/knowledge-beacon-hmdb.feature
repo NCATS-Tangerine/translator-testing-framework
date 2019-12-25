@@ -1,4 +1,4 @@
-Feature: Check all knowledge sources
+Feature: Check HMDB Knowledge Beacon
 
     Scenario: Check HMDB knowledge map
         Given a knowledge source at "https://translator.ncats.io/hmdb-knowledge-beacon"
@@ -40,7 +40,7 @@ Feature: Check all knowledge sources
     Scenario: Check HMDB categories
         Given a knowledge source at "https://translator.ncats.io/hmdb-knowledge-beacon"
         When we fire "/categories" query
-        Then the response contains the following entries in "category"
+        Then the response entries contain the following entries in the field "category"
             | category                   |
             | metabolite                 |
             | protein                    |
@@ -61,7 +61,7 @@ Feature: Check all knowledge sources
     Scenario: Check HMDB predicates
         Given a knowledge source at "https://translator.ncats.io/hmdb-knowledge-beacon"
         When we fire "/predicates" query
-        Then the response contains the following entries in "relation"
+        Then the response entries contain the following entries in the field "relation"
             | relation        |
             | interacts with  |
             | located in      |
@@ -73,7 +73,7 @@ Feature: Check all knowledge sources
             | located in      |
             | participates in |
             | related to      |
-        And the response contains the following entries in "edge_label"
+        And the response entries contain the following entries in the field "edge_label"
             | edge_label      |
             | interacts_with  |
             | located_in      |
@@ -87,24 +87,26 @@ Feature: Check all knowledge sources
             | related_to      |
 
 
-    Scenario: Check HMDB concepts
+    Scenario: Check Check keyword query of HMDB concepts
         Given a knowledge source at "https://translator.ncats.io/hmdb-knowledge-beacon"
         When we fire "/concepts?keywords=aspirin&categories=metabolite" query
-        Then the response contains "Aspirin" in "name"
+        Then some entry in the response contains "Aspirin" in field "name"
 
 
     Scenario: Check HMDB exactmatches
         Given a knowledge source at "https://translator.ncats.io/hmdb-knowledge-beacon"
         When we fire "/exactmatches?c=CHEBI:15365" query
         Then the size of the response is 1
-        And the response should have some JSONPath "$[0].has_exact_matches[0]" with "string" "HMDB:HMDB0001879"
+        And the response entries contain the following entries in the field "has_exact_matches"
+            | has_exact_matches |
+            | HMDB:HMDB0001879  |
 
 
-    Scenario: Check HMDB concept
+    Scenario: Check one particular HMDB concept
         Given a knowledge source at "https://translator.ncats.io/hmdb-knowledge-beacon"
         When we fire "/concepts/HMDB:HMDB0001879" query
-        Then the response should have some JSONPath "id" with "string" "HMDB:HMDB0001879"
-        Then the response should have some JSONPath "name" with "string" "Aspirin"
+        Then the response should have a field "id" with "string" "HMDB:HMDB0001879"
+        Then the response should have a field "name" with "string" "Aspirin"
 
 
     Scenario: Check HMDB statements
@@ -118,8 +120,8 @@ Feature: Check all knowledge sources
             | Aspirin |
 
 
-    Scenario: Check HMDB statement
+    Scenario: Check one particular HMDB statement
         Given a knowledge source at "https://translator.ncats.io/hmdb-knowledge-beacon"
         When we fire "/statements/2" query
-        Then the response should have some JSONPath "id" with "string" "2"
-        And the response should have some JSONPath "provided_by" with "string" "http://www.hmdb.ca/"
+        Then the response should have a field "id" with "string" "2"
+        And the response should have a field "provided_by" with "string" "http://www.hmdb.ca/"
