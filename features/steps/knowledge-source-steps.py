@@ -1,10 +1,13 @@
 from behave import given, when, then
 import requests
+import jsonpath_rw
+import logging
 from contextlib import closing
 
 """
-Knowldge-source tests
+Knowldege-source tests
 """
+
 
 @given('a knowledge source at "{url}"')
 def step_impl(context, url):
@@ -42,6 +45,10 @@ def step_impl(context, key, parent):
         assert row[key] in entries
 
 
+def get_collected_entries(context,key):
+    pass
+
+
 @then('the response contains the following entries in "{key}"')
 def step_impl(context, key):
     """
@@ -63,7 +70,7 @@ def step_impl(context, value, key):
     """
     This step checks whether all values specified in the test are contained in the response
     """
-    entries = set()
+    collected_entries = set()
     print('Collected entries:')
     for entry in context.response_json:
         field_value = entry[key]
@@ -71,14 +78,14 @@ def step_impl(context, value, key):
         if isinstance(field_value, list):
             for item in field_value:
                 print(' ', item)
-                entries.add(item)
+                collected_entries.add(item)
         else:  # assume a simple scalar
             print(' ', field_value)
-            entries.add(field_value)
+            collected_entries.add(field_value)
 
     print('Tested entry:')
     print(' ', value)
-    assert value in entries
+    assert value in collected_entries
 
 
 @then('the response only contains the following entries in "{key}" of "{parent}"')
@@ -86,7 +93,7 @@ def step_impl(context, key, parent):
     """
     This step checks whether all values found in the response are contained in the test table
     """
-    entries = set()
+    collected_entries = set()
     print('Collected entries:')
     for row in context.table:
         field_value = row[key]
@@ -94,15 +101,23 @@ def step_impl(context, key, parent):
         if isinstance(field_value, list):
             for item in field_value:
                 print(' ', item)
-                entries.add(item)
+                collected_entries.add(item)
         else:  # assume a simple scalar
             print(' ', field_value)
-            entries.add(field_value)
+            collected_entries.add(field_value)
 
     print('Tested entries:')
+    tested_entries = set()
     for entry in context.response_json:
-        print(' ', entry[parent][key])
-        assert entry[parent][key] in entries
+        field_value = entry.get(parent).get(key)
+        if isinstance(field_value, list):
+            for item in field_value:
+                tested_entries.add(item)
+        else:  # assume a simple scalar
+            tested_entries.add(field_value)
+    for item in tested_entries:
+        print(' ', item)
+        assert item in collected_entries
 
 
 @then('the response only contains the following entries in "{key}"')
@@ -120,6 +135,7 @@ def step_impl(context, key):
         print(' ', entry[key])
         assert entry[key] in entries
 
+
 @then('the size of the response is {size}')
 def step_impl(context, size):
     """
@@ -127,3 +143,32 @@ def step_impl(context, size):
     """
     assert len(context.response_json) == int(size)
 
+
+@then('the response should have some entry with field "{field}" with "{data_type}" "{value}"')
+def step_impl(context, field, data_type, value):
+    """
+    The response should have some entry with a field containing a defined value of a specified data type.
+    """
+    field_expr = jsonpath_rw.parse(field)
+    for entry in context.response_json:
+        results = field_expr.find(entry)
+        assert len(results) != 0
+        if data_type == "string":
+            value = str(value)
+        elif data_type == "integer":
+            value = int(value)
+        elif data_type == "float":
+            value = float(value)
+        elif data_type == "boolean":
+            value = eval(value)
+        else:
+            logging.error("Unhandled data_type: {}".format(data_type))
+            assert False
+
+        is_found = False
+        for r in results:
+            if r.value == value:
+                is_found = True
+                break
+
+        assert is_found is True
