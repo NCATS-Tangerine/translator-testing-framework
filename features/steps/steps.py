@@ -130,6 +130,11 @@ def step_impl(context):
     }
 
 
+@given('query_graph')
+def step_impl(context):
+    context.query_graph = json.loads(context.text)
+
+
 """
 When
 """
@@ -480,6 +485,29 @@ def step_impl(context, json_path, data_type, value):
             is_found = True
 
     assert is_found is True
+
+
+@then('the response should have some result that binds node {qg_id} to {kg_id}')
+def step_impl(context, qg_id, kg_id):
+    found = False
+    for result in context.response_json['results']:
+        for nb in result['node_bindings']:
+            if nb['qg_id'] == qg_id and nb['kg_id'] == kg_id:
+                found = True
+                break
+    assert found == True
+
+
+@then('the response should have some result that binds edge {qg_id} to {kg_id}')
+def step_impl(context, qg_id, kg_id):
+    found = False
+    for result in context.response_json['results']:
+        for nb in result['edge_bindings']:
+            if nb['qg_id'] == qg_id and nb['kg_id'] == kg_id:
+                found = True
+                break
+    assert found == True
+
 
 @when('the message is processed by {url}')
 def call(context, url):
