@@ -18,3 +18,20 @@ Feature: Check mediKanren responses
         When the message is processed by http://localhost:8000/query
         Then we expect a HTTP "200"
         And the response should have some result that binds node n02 to UMLS:C1823619
+
+    Scenario: Nausea Query finds Isopropyl Alcohol
+        Given query_graph
+        """
+        {
+            "nodes": [
+                {"id": "n01", "type": "chemical_substance"},
+                {"id": "n02", "curie": "UMLS:C0027497"}
+            ],
+            "edges": [
+                {"id": "e12", "type": "treats",           "source_id": "n01", "target_id": "n02"}
+            ]
+        }
+        """
+        When the message is processed by http://localhost:8000/query
+        Then we expect a HTTP "200"
+        And the response should have some result that binds node n01 to UMLS:C0022237
