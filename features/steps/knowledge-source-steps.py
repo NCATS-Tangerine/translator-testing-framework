@@ -1,4 +1,5 @@
 from behave import given, when, then
+import json
 import requests
 import jsonpath_rw
 import logging
@@ -25,6 +26,18 @@ def step_impl(context, query):
     url = context.base_url+query
     print('url:',url,'\n')
     with closing(requests.get(url)) as response:
+        context.response = response
+        context.response_json = response.json()
+
+
+@when('we fire "{query}" query with the following body')
+def step_impl(context, query):
+    """
+    Fire a knowledge-source query
+    """
+    url = context.base_url+query
+    print('url:',url,'\n')
+    with closing(requests.post(url, json=json.loads(context.text))) as response:
         context.response = response
         context.response_json = response.json()
 
@@ -181,6 +194,14 @@ def step_impl(context, size):
     """
     assert len(context.response_json) == int(size)
 
+
+
+@then('the size of entry "{key}" is {size}')
+def step_impl(context, key, size):
+    """
+    This step checks the size of the response
+    """
+    assert len(context.response_json[key]) == int(size)
 
 @then('the response should have a field "{field}" with "{data_type}" "{value}"')
 def step_impl(context, field, data_type, value):
