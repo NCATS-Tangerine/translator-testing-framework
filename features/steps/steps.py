@@ -133,7 +133,7 @@ def step_impl(context):
                 ]
             }
         },
-        "max_results": 100
+        "max_results": 200
     }
 
 
@@ -247,7 +247,7 @@ def step_impl(context):
     status code, and stores the response in context. If the question has been provided in natural language format (in
     context.human_question), it first sends that to RTX for translation into a machine question.
     """
-    rtx_api_url = "https://rtx.ncats.io/api/rtx/v1"
+    rtx_api_url = "https://arax.rtx.ai/api/rtx/v1"
     rtx_headers = {'accept': 'application/json'}
 
     # First translate the natural language question, if there is one
@@ -258,6 +258,7 @@ def step_impl(context):
         context.machine_question = translate_response.json()
 
     # Then query RTX with the translated question
+    context.machine_question["bypass_cache"] = "true"
     query_response = requests.post(rtx_api_url + "/query", json=context.machine_question, headers=rtx_headers)
     print(query_response.status_code, query_response.text)  # Only displays if test fails
     assert query_response.status_code == 200
