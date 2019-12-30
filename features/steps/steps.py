@@ -1,10 +1,9 @@
-from functools import partial
 import jsonpath_rw
 import logging
 import requests
 import json
 import pandas as pd
-import sys
+
 from behave import given, when, then, use_step_matcher
 from contextlib import closing
 from reasoner_diff.test_robokop import answer as robokop_answer
@@ -19,6 +18,7 @@ from parse_answer import parse_answer
 Given
 """
 
+
 @given('the TranQL query')
 def step_impl(context):
     """
@@ -26,14 +26,17 @@ def step_impl(context):
     """
     context.tranql_query = context.text
 
+
 @given('a question "{question_type}"')
 def step_impl(context, question_type):
     context.question = question_map[question_type]
+
 
 @given('node mappings')
 def step_impl(context):
     node_mappings = json.loads(context.text)
     context.question = fill_template(context.question, node_mappings)
+
 
 @given('the "{language}" question "{question}"')
 def step_impl(context, language, question):
@@ -42,9 +45,11 @@ def step_impl(context, language, question):
         "text": question
     }
 
+
 @given('the machine question')
 def step_impl(context):
     context.machine_question = json.loads(context.text)
+
 
 @given('a query graph "{reasoner}"')
 def step_impl(context, reasoner):
@@ -83,10 +88,12 @@ def step_impl(context, reasoner):
         context.answer_graphs = []
     context.answer_graphs.append(answer_graph_map[reasoner])
 
+
 @given('identifier {ident} and type {stype}')
 def step_impl(context,ident,stype):
     context.identifier = ident
     context.semantic_type = stype
+
 
 @given('identifiers {ident} and type {stype}')
 def step_impl(context,ident,stype):
@@ -134,12 +141,14 @@ def step_impl(context):
 When
 """
 
+
 @when('we call synonymizer')
 def step_impl(context):
     url=f'http://robokop.renci.org:6010/api/synonymize/{context.identifier}/{context.semantic_type}/'
     response = requests.post(url)
     context.response = response
     context.response_json = response.json()
+
 
 @when('we call gamma similarity with result type {rtype}, intermediate type {itype}, and threshold {thresh:f}')
 def step_impl(context,rtype,itype,thresh):
@@ -148,6 +157,7 @@ def step_impl(context,rtype,itype,thresh):
     response = requests.get(url, params = params)
     context.response = response
     context.similarity_result = pd.DataFrame(response.json())
+
 
 @when('we call gamma enrichment with result type {rtype}')
 def step_impl(context,rtype):
@@ -158,7 +168,6 @@ def step_impl(context,rtype):
     df = pd.DataFrame(response.json())
     df.sort_values(by='p',inplace=True)
     context.enrichment_result = df
-
 
 
 @when('we fire the query to TranQL we expect a HTTP "{status_code:d}"')
@@ -174,6 +183,7 @@ def step_impl(context, status_code):
         assert response.status_code == status_code
         context.response_text = response.text
         context.response_json = response.json()
+
 
 @when('we fire the query to "{reasoner}" with URL "{url}" we expect a HTTP "{status_code:d}"')
 def step_impl(context, reasoner, url, status_code):
@@ -201,6 +211,7 @@ def step_impl(context, reasoner, url, status_code):
             context.response_text = response.text
             context.response_json = response.json()
 
+
 @when('we fire an actual query to "{reasoner}" with URL "{url}" we expect a HTTP "{status_code:d}"')
 def step_impl(context, reasoner, url, status_code):
     """
@@ -215,6 +226,7 @@ def step_impl(context, reasoner, url, status_code):
         assert response.status_code == status_code
         context.response_text = response.text
         context.response_json = response.json()
+
 
 @when('we fire the query to URL "{url}"')
 def step_impl(context, url ):
@@ -276,9 +288,11 @@ def step_impl(context):
 Then
 """
 
+
 @then('we expect a HTTP "{value:d}"')
 def step_impl(context,value):
     assert context.response.status_code == value
+
 
 @then('the response should contain "{value}"')
 def step_impl(context, value):
@@ -407,23 +421,28 @@ def step_impl(context, json_path, data_type, value):
 
     assert is_found is True
 
+
 @then('we expect the main identifier to be {identifier}')
-def step_impl(context,identifier):
+def step_impl(context, identifier):
     assert context.response_json['id'] == identifier
 
+
 @then('we expect the name to be "{name}"')
-def step_impl(context,name):
+def step_impl(context, name):
     assert context.response_json['name'] == name
+
 
 @then('we expect the equivalent identifiers to contain {identifier}')
 def step_impl(context,identifier):
     syns = [ x[0] for x in context.response_json['synonyms'] ]
     assert identifier in syns
 
+
 @then('we do not expect the equivalent identifiers to contain {identifier}')
 def step_impl(context,identifier):
     syns = [ x[0] for x in context.response_json['synonyms'] ]
     assert not identifier in syns
+
 
 @then('at least {x:d} of the top {y:d} names of node {nid} should contain the text "{text}"')
 def step_impl(context,x,y,nid,text):
@@ -432,6 +451,7 @@ def step_impl(context,x,y,nid,text):
     n = len(list(filter(lambda x: text in x, names)))
     assert(n >= x)
 
+
 @then('the top {x:d} names of node {nid} should contain "{names_string}"')
 def step_impl(context,x,nid,names_string):
     aframe = parse_answer(context.response_json,node_list=[f'{nid}'])
@@ -439,6 +459,7 @@ def step_impl(context,x,nid,names_string):
     names = names_string.split(',')
     for name in names:
         assert name in answernames
+
 
 @then('we expect the name of the most similar to be "{simname}"')
 def step_impl(context,simname):
@@ -449,6 +470,7 @@ def step_impl(context,simname):
 def step_impl(context,enriched_name):
     most_enriched = context.enrichment_result.iloc[0]['name']
     assert most_enriched == enriched_name
+
 
 @then('the response should have some JSONPath "{json_path}" containing "{data_type}" "{value}"')
 def step_impl(context, json_path, data_type, value):
@@ -481,6 +503,7 @@ def step_impl(context, json_path, data_type, value):
 
     assert is_found is True
 
+
 @when('the message is processed by {url}')
 def call(context, url):
     """Send message to microservice."""
@@ -497,7 +520,6 @@ def call(context, url):
     context.response_json = context.response.json()
 
 use_step_matcher('re')
-
 
 # This is much too generic a pattern matching template which
 # will override any other @given in the steps.py file which starts with the English article 'a'
@@ -524,6 +546,7 @@ use_step_matcher('re')
 #    """Add a scalar value to context."""
 #    key = key.replace(' ', '_')
 #    setattr(context, key, json.loads(context.text))
+
 
 @then(
     r'the response should have '
@@ -569,5 +592,6 @@ def check_json(context, **kwargs):
             assert any(value and type(value[0])(kwargs['value']) in value for value in values)
         else:
             assert any(value and value == type(value)(kwargs['value']) for value in values)
+
 
 use_step_matcher("parse")
