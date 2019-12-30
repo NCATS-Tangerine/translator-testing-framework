@@ -4,30 +4,73 @@ This repo is a prototype to demonstrate how [Behave](https://behave.readthedocs.
 
 ## Getting started
 
+### Cloning the Repository
+
 Clone this repository,
 ```
 git clone --recursive https://github.com/deepakunni3/translator-testing-framework.git
 ```
 
-**Note:** Be sure to use `--recursive` flag to clone the [NCATS-Tangerine/NCATS-ReasonerStdAPI-diff](https://github.com/NCATS-Tangerine/NCATS-ReasonerStdAPI-diff) dependency.
+**Note:** Be sure to use `--recursive` flag to clone the 
+[NCATS-Tangerine/NCATS-ReasonerStdAPI-diff](https://github.com/NCATS-Tangerine/NCATS-ReasonerStdAPI-diff) dependency.
 
+### Creation of a Python 3.7 Virtual Environment
 
 After cloning the repo, set up a virtual environment using Python 3's `venv` module (or your preferred tool, e.g. 
 Conda or local IDE equivalent),
 
 ```
-python3 -m venv my-working-environment
+python3.7 -m venv venv
 ```
 
-Then, activate `my-working-environment`,
+Here, `python3.7` is assumed to be a Python 3.7 binary. On your systems, you may simply need to type `python3` or even 
+`python` (if your default python executable is a release 3.7 or better binary).
+
+The command creates a virtual environment `venv`, which may be activated by typing:
+
 ```
-source my-working-environment/bin/activate
+source venv/bin/activate
 ```
+
+To exit the environment, type:
+
+```
+deactivate
+```
+
+To reenter, source the activate command again.
+
+Alternately, you can also use use `conda` env to manage packages and the development environment:
+
+```
+conda create -n translator-modules python=3.7
+conda activate translator-modules
+```
+
+Some IDE's (e.g. PyCharm) may also have provisions for directly creating such a virtualenv. This should also work fine. 
+Simply follow your IDE specific instructions to configure it.
+
+### Installation of Python Dependencies
 
 Now install required packages,
+
 ```
-pip install -r requirements.txt
+pip install -r requirements.txt --no-cache-dir
 ```
+
+The `--no-cache-dir` flag ensures that the latest git repositories of special dependency projects are imported each 
+time this command is run, given the "research and development" nature of this testing repo.
+
+Note: double check which version of `pip` you have and its relationship to your Python executable. In some contexts, 
+the visible `pip` will not be targeting your python3 binary. A safer way to execute `pip` may therefore be as follows: 
+
+```
+python -m pip install -r requirements.txt --no-cache-dir
+```
+
+Note that given the rapid cycles of development of the various NCATS projects being covered by Behave tests, it is 
+advisable to periodically rerun the pip module installation process to ensure access to the latest synchronized code, 
+especially after a `git pull` operation is done.
 
 ## Running Local support services for the Behave tests
 
@@ -58,6 +101,14 @@ To run the TranQL tests, you must run the TranQL dev server. You need to use
 To run the dev server, follow the installation and usage guide in the repository's README file. 
 You only need to run the backplane and API.
 
+### Translator Modules Support Services
+
+Behave testing for several test scenarios in the Translator Modules feature testing require access to support web 
+services which need to be running and accessible before running the tests.  Instructions for running these services is 
+[documented here](https://github.com/ncats/translator-modules#special-prerequisite-for-running-the-translator-modules).
+Either the DNS or system environment variables should be set to point to the services as indicated in the section about 
+[support service host name resolution](https://github.com/ncats/translator-modules#service-host-name-resolution).
+
 ## Running Behave tests
 
 To run the Behave tests,
@@ -73,6 +124,13 @@ behave -i features/check-reasoners.feature
 
 To only run TranQL specific tests, run 
 `behave features/tranql-invalid-schema.feature features/tranql-reasoners.feature` in the root directory.
+
+The behave outputs may be controlled with a variety of flags. Try:
+
+```shell
+behave  --no-capture --no-capture-stderr --no-color -i features/check-reasoners.feature
+```
+
 
 ## Run with Docker
 

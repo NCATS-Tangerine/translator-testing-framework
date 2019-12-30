@@ -1,6 +1,6 @@
-my-working-environment/
 .idea
 *.pyc
 /venv/
 /reasoner_diff/*
 **/__pycache__
+/features/test.feature
