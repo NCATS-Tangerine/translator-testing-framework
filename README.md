@@ -1,5 +1,7 @@
 # translator-testing-framework
 
+[![Build Status](https://travis-ci.org/deepakunni3/translator-testing-framework.svg?branch=master)](https://travis-ci.org/deepakunni3/translator-testing-framework)
+
 This repo is a prototype to demonstrate how [Behave](https://behave.readthedocs.io/en/latest/) can be utilized to write tests in natural language. The interpretation and behavior of the natural language statements are handled by Python code.
 
 ## Getting started
