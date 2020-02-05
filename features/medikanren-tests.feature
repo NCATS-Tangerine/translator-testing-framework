@@ -158,3 +158,22 @@ Feature: Check mediKanren responses
        When the message is processed by http://localhost:8000/query
        Then we expect a HTTP "200"
        And the response should have some result that binds node n01 to CHEBI:16412
+
+    Scenario: ATM gene is found to upregulate expression of the protein angiotensin II. Angiotensin II, in turn, is found to upregulates expression of the ACE2 gene.
+      Given query_graph
+       """
+       {
+           "nodes": [
+               {"id": "n01", "curie": "UMLS:C0919524"},
+               {"id": "n02", "type": "biological_entity"},
+               {"id": "n03", "curie": "UMLS:C1422064"}
+           ],
+           "edges": [
+               {"id": "e12", "type": "positively_regulates, produces", "source_id": "n01", "target_id": "n02"},
+               {"id": "e23", "type": "positively_regulates, produces", "source_id": "n02", "target_id": "n03"}
+           ]
+       }
+       """
+       When the message is processed by http://localhost:8000/query
+       Then we expect a HTTP "200"
+       And the response should have some result that binds node n02 to UMLS:C0003009
